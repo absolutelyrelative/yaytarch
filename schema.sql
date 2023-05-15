@@ -1,4 +1,6 @@
 DROP TABLE IF EXISTS video;
+DROP TABLE IF EXISTS collection;
+DROP TABLE IF EXISTS videocollectionmembership;
 
 CREATE TABLE video (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
