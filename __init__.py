@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from . import db
+from . import db, videoplay, collectionview
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -15,6 +15,8 @@ def create_app(test_config=None):
         pass
 
     db.init_app(app)
+    app.register_blueprint(videoplay.bp)
+    app.register_blueprint(collectionview.bp)
         
     """     #
     if test_config is None:
