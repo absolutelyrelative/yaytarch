@@ -10,18 +10,14 @@ from yaytarch.db import get_db
 
 bp = Blueprint('collections', __name__)
 
-@bp.route('/collections', methods=('GET', 'POST'))
-def collections():
+@bp.route('/', methods=('GET', 'POST'))
+def index():
     db = get_db()
     error = None #Will be used to show if there are no collections
     collections = db.execute(
         'SELECT * FROM videocollection'
     ).fetchall()
 
-    for rows in collections:
-        for columns in collections[rows]:
-            print(columns)
-
-    return render_template('collections.html')
+    return render_template('collections.html', collections = collections)
 
 """ https://stackoverflow.com/questions/55961665/flask-wont-play-a-video-in-the-html """

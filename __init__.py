@@ -17,6 +17,7 @@ def create_app(test_config=None):
     db.init_app(app)
     app.register_blueprint(videoplay.bp)
     app.register_blueprint(collectionview.bp)
+    app.add_url_rule('/', endpoint='index')
         
     """     #
     if test_config is None:
