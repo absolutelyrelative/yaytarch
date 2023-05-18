@@ -20,4 +20,7 @@ def index():
 
     return render_template('collections.html', collections = collections)
 
+@bp.route('/collection/<int:collection_id>')
+def viewcollection(collection_id):
+    return ('You asked for collection{0}'.format(collection_id))
 """ https://stackoverflow.com/questions/55961665/flask-wont-play-a-video-in-the-html """

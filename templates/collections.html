@@ -10,7 +10,7 @@
       <header>
         <div>
           <h1>{{ collection['vcname'] }}</h1>
-          <div class="about">by {{ collection['shorturl'] }}, id {{ collection['id'] }}</div>
+          <div class="about">by {{ collection['shorturl'] }}, id {{ collection['id'] }} <li><a href="{{ url_for('collections.viewcollection', collection_id=collection['id']) }}">Name test</a></div>
         </div>
       </header>
     </article>
