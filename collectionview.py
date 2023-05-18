@@ -28,3 +28,11 @@ def viewcollection(collection_id):
     ).fetchall()
 
     return render_template('videolist.html', videos = videos)
+
+@bp.route('/video/<int:video_id>')
+def viewvideo(video_id):
+    db = get_db()
+    videos = db.execute('SELECT * FROM video WHERE video.id = ' + str(video_id)
+    ).fetchall()
+
+    return render_template('videoplay.html', videos = videos)
