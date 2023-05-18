@@ -22,5 +22,9 @@ def index():
 
 @bp.route('/collection/<int:collection_id>')
 def viewcollection(collection_id):
-    return ('You asked for collection{0}'.format(collection_id))
-""" https://stackoverflow.com/questions/55961665/flask-wont-play-a-video-in-the-html """
+    db = get_db()
+    videos = db.execute(
+        'SELECT * FROM video WHERE video.id IN (SELECT videoid FROM videocollectionmembership WHERE videocollectionmembership.collectionid = ' + str(collection_id) + ');'
+    ).fetchall()
+
+    return render_template('videolist.html', videos = videos)
