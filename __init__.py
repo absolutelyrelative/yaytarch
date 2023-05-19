@@ -1,6 +1,8 @@
 import os
 from flask import Flask
-from . import db, videoplay, collectionview
+from . import db, collectionview
+from yt_dlp import YoutubeDL
+import click
 
 def create_app(test_config=None):
     app = Flask(__name__, instance_relative_config=True)
@@ -15,22 +17,24 @@ def create_app(test_config=None):
         pass
 
     db.init_app(app)
-    app.register_blueprint(videoplay.bp)
     app.register_blueprint(collectionview.bp)
     app.add_url_rule('/', endpoint='index')
-        
-    """     #
-    if test_config is None:
-        # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
-    else:
-        # load the test config if passed in
-        app.config.from_mapping(test_config)
-    # """
-
 
     @app.route('/')
     def hello():
         return "Hello."
+
+    @app.cli.command("dl")
+    @click.argument("link")
+    def dl(link):
+        locdict = {
+            'home' : os.getcwd() + '\\videos\\'
+        }
+        output_template_dic = {
+            'default' : "%(id)s.%(ext)s"
+        }
+        ytdlp_options = {'paths' : locdict, 'outtmpl' : output_template_dic}
+        with YoutubeDL(ytdlp_options) as ydl:
+            ydl.download(link)
 
     return app
