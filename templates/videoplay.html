@@ -12,7 +12,7 @@
           <h1>ID: <a href="{{ url_for('collections.viewvideo', video_id=video['id']) }}">{{ video['id'] }}</a></h1>
           <div class="about"> SHURL: {{ video['shorturl'] }}, LOC: {{ video['loc'] }}, DWNLED: {{ video['downloaded'] }}</div>
           <video width="320" height="240" controls>
-            <source src="{{ url_for('static', filename=video['loc']) }}" type="video/mp4">
+            <source src="{{ video['loc'] }}" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         </div>
