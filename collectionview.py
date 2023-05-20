@@ -1,7 +1,7 @@
 import functools
 
 from flask import (
-    Blueprint, flash, g, redirect, render_template, request, url_for
+    Blueprint, flash, g, redirect, render_template, request, url_for, send_from_directory
 )
 
 from yaytarch.db import get_db
@@ -32,7 +32,14 @@ def viewcollection(collection_id):
 @bp.route('/video/<int:video_id>')
 def viewvideo(video_id):
     db = get_db()
+
     videos = db.execute('SELECT * FROM video WHERE video.id = ' + str(video_id)
     ).fetchall()
 
     return render_template('videoplay.html', videos = videos)
+
+@bp.route("/video/movie1")
+def load_video():
+    test1 = "C:/Users/Pawel/Downloads/"
+    test2 = "movie.mp4"
+    return send_from_directory(test1, test2)
