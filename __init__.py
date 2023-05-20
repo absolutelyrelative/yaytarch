@@ -22,10 +22,6 @@ def create_app(test_config=None):
     app.register_blueprint(collectionview.bp)
     app.add_url_rule('/', endpoint='index')
 
-    @app.route('/')
-    def hello():
-        return "Hello."
-
     @app.cli.command("dl")
     @click.argument("link")
     def dl(link):
@@ -43,7 +39,7 @@ def create_app(test_config=None):
             dict_dump = ydl.sanitize_info(info)
             subdct = {key: dict_dump[key] for key in coolkeys}
             ydl.download(link)
-            registervideo(dict_dump, locdict)
+            registervideo(subdct, locdict)
     
     def registervideo(dict, locdict):
         db = get_db()
@@ -52,13 +48,33 @@ def create_app(test_config=None):
 
         try:
             db.execute(
-                "INSERT INTO video (shorturl, loc, downloaded) VALUES (?, ?, ?)",
-                (dict['id'], loc, 1),
+                "INSERT INTO video (shorturl, loc, downloaded, title, width, height, descr, resolution) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+                (dict['id'], loc, 1, dict['title'], dict['width'], dict['height'], dict['description'], dict['resolution']),
             )
             db.commit()
         except db.IntegrityError:
             print("oops")
         else:
             pass
+
+        #TODO: Pass into its own generalised function with automatic ID detection
+        # this is just to make testing easier for the moment
+        
+        #Add to 'All' category automatically
+        print(dict['id'])
+        video = db.execute('SELECT id FROM video WHERE video.shorturl = "' + dict['id'] + '"'
+        ).fetchone()
+        videokey = video['id']
+        try:
+            db.execute(
+                "INSERT INTO videocollectionmembership (videoid, collectionid) VALUES (?, ?)",
+                (videokey,1),
+            )
+            db.commit()
+        except db.IntegrityError:
+            print("oops")
+        else:
+            pass
+
     
     return app
