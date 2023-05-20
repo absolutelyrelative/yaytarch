@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block header %}
-  <h1>{% block title %}Watching video WIP{% endblock %}</h1>
+  <h1>{% block title %}Playing {{ video['title'] }}{% endblock %}</h1>
 {% endblock %}
 
 {% block content %}
@@ -12,7 +12,7 @@
           <h1>ID: <a href="{{ url_for('collections.viewvideo', video_id=video['id']) }}">{{ video['id'] }}</a></h1>
           <div class="about"> SHURL: {{ video['shorturl'] }}, LOC: {{ video['loc'] }}, DWNLED: {{ video['downloaded'] }}</div>
           <video width="320" height="240" controls>
-            <source src="{{ url_for('collections.load_video') }}" type="video/mp4">
+            <source src="{{ url_for('collections.load_video', video_id=video['id']) }}" type="video/mp4">
             Your browser does not support the video tag.
           </video>
         </div>
