@@ -5,6 +5,7 @@ from flask import (
 )
 
 from yaytarch.db import get_db
+import os
 
 #This blueprint shows all the available collections
 
@@ -29,6 +30,7 @@ def viewcollection(collection_id):
 
     return render_template('videolist.html', videos = videos)
 
+
 @bp.route('/video/<int:video_id>')
 def viewvideo(video_id):
     db = get_db()
@@ -38,8 +40,14 @@ def viewvideo(video_id):
 
     return render_template('videoplay.html', videos = videos)
 
-@bp.route("/video/movie1")
-def load_video():
-    test1 = "C:/Users/Pawel/Downloads/"
-    test2 = "movie.mp4"
-    return send_from_directory(test1, test2)
+@bp.route("/video/source/<int:video_id>")
+def load_video(video_id):
+    db = get_db()
+    video = db.execute('SELECT loc FROM video WHERE video.id = ' + str(video_id)
+    ).fetchone()
+    location_from_db = video['loc']
+
+    file_name = os.path.basename(location_from_db)
+    dir_name = os.path.dirname(location_from_db)
+
+    return send_from_directory(dir_name, file_name)
