@@ -1,22 +1,22 @@
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}Videos{% endblock %}</h1>
-{% endblock %}
-
 {% block content %}
+<!-- !PAGE CONTENT! -->
+<div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
+
   {% for video in videos %}
-    <article class="post">
-      <header>
-        <div>
-          <h1>ID: <a href="{{ url_for('collections.viewvideo', video_id=video['id']) }}">{{ video['id'] }}</a></h1>
-          <div class="about"> SHURL: {{ video['shorturl'] }}, LOC: {{ video['loc'] }}, DWNLED: {{ video['downloaded'] }}</div>
-        </div>
-      </header>
-    </article>
-    {% if not loop.last %}
+  <!-- First Photo Grid-->
+  <div class="w3-row-padding w3-padding-16 w3-center" id="food">
+    <div class="w3-quarter">
+      <img src="/w3images/sandwich.jpg" alt="Sandwich" style="width:100%">
+      <h1>ID: <a href="{{ url_for('collections.viewvideo', video_id=video['id']) }}">{{ video['id'] }}</a></h1>
+      <p>SHURL: {{ video['shorturl'] }}, LOC: {{ video['loc'] }}, DWNLED: {{ video['downloaded'] }}</p>
+    </div>
+  </div>
+  {% if not loop.last %}
       <hr>
     {% endif %}
   {% endfor %}
+<!-- End page content -->
+</div>
 {% endblock %}
-</section>

@@ -16,3 +16,4 @@ build/
 list.txt
 static/*.mp4
 static/videos
+templates/dummy

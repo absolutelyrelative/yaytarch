@@ -1,22 +1,24 @@
 {% extends 'base.html' %}
 
-{% block header %}
-  <h1>{% block title %}Collections{% endblock %}</h1>
-{% endblock %}
 
 {% block content %}
+<!-- !PAGE CONTENT! -->
+<div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
+
   {% for collection in collections %}
-    <article class="post">
-      <header>
-        <div>
-          <h1>{{ collection['vcname'] }}</h1>
-          <div class="about">by {{ collection['shorturl'] }}, id {{ collection['id'] }} <li><a href="{{ url_for('collections.viewcollection', collection_id=collection['id']) }}">Name test</a></div>
-        </div>
-      </header>
-    </article>
-    {% if not loop.last %}
+  <!-- First Photo Grid-->
+  <div class="w3-row-padding w3-padding-16 w3-center" id="food">
+    <div class="w3-quarter">
+      <img src="/w3images/sandwich.jpg" alt="Sandwich" style="width:100%">
+      <h3>{{ collection['vcname'] }}</h3>
+      <p>by {{ collection['shorturl'] }}, id {{ collection['id'] }}</p>
+      <p><a href="{{ url_for('collections.viewcollection', collection_id=collection['id']) }}">Name test</a></p>
+    </div>
+  </div>
+  {% if not loop.last %}
       <hr>
     {% endif %}
   {% endfor %}
+<!-- End page content -->
+</div>
 {% endblock %}
-</section>
