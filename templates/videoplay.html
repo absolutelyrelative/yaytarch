@@ -6,10 +6,10 @@
   <div class="w3-center">
   
     {% for video in videos %}
-      <h1>ID: <a href="{{ url_for('collections.viewvideo', video_id=video['id']) }}">{{ video['id'] }}</a></h1>
+      <h1>ID: <a href="{{ url_for('videos.viewvideo', video_id=video['id']) }}">{{ video['id'] }}</a></h1>
           <div class="about"> SHURL: {{ video['shorturl'] }}, LOC: {{ video['loc'] }}, DWNLED: {{ video['downloaded'] }}</div>
           <video width="600" height="400" controls>
-            <source src="{{ url_for('collections.load_video', video_id=video['id']) }}" type="video/mp4">
+            <source src="{{ url_for('videos.load_video', video_id=video['id']) }}" type="video/mp4">
             Your browser does not support the video tag.
           </video>
     {% if not loop.last %}

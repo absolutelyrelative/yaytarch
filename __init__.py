@@ -1,6 +1,6 @@
 import os
 from flask import Flask
-from . import db, collectionview
+from . import db, collections, videos
 from yt_dlp import YoutubeDL
 import click
 from yaytarch.db import get_db
@@ -19,7 +19,8 @@ def create_app(test_config=None):
         pass
 
     db.init_app(app)
-    app.register_blueprint(collectionview.bp)
+    app.register_blueprint(collections.bp)
+    app.register_blueprint(videos.bp)
     app.add_url_rule('/', endpoint='index')
 
     @app.cli.command("dl")
