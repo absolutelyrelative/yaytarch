@@ -14,7 +14,7 @@ bp = Blueprint('collections', __name__)
 @bp.route('/', methods=('GET', 'POST'))
 def index():
     db = get_db()
-    error = None #Will be used to show if there are no collections
+
     collections = db.execute(
         'SELECT * FROM videocollection'
     ).fetchall()
