@@ -1,5 +1,6 @@
 import functools, click
 from yt_dlp import YoutubeDL
+from .tools import bcolors
 
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, send_from_directory
@@ -56,35 +57,32 @@ def dl(link):
     
 def registervideo(dict, locdict):
     db = get_db()
+    cursor = db.cursor()
     loc = locdict['home'] + dict['id'] + '.' + dict['ext']
     print('location: ' + loc)
 
     try:
-        db.execute(
+        cursor.execute(
             "INSERT INTO video (shorturl, loc, downloaded, title, width, height, descr, resolution) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (dict['id'], loc, 1, dict['title'], dict['width'], dict['height'], dict['description'], dict['resolution']),
         )
         db.commit()
-    except db.IntegrityError:
-        print("oops")
+    except db.IntegrityError as db_error:
+        print(bcolors.WARNING + "Problem adding video. Has the video already been downloaded?" + bcolors.ENDC)
+        print("{}".format(db_error))
     else:
-        pass
+        addvideotocollection(cursor.lastrowid, 1) #TODO: Remove "All Videos" category hardcode?
 
-    #TODO: Pass into its own generalised function with automatic ID detection
-    # this is just to make testing easier for the moment
-    
-    #Add to 'All' category automatically
-    print(dict['id'])
-    video = db.execute('SELECT id FROM video WHERE video.shorturl = "' + dict['id'] + '"'
-    ).fetchone()
-    videokey = video['id']
+def addvideotocollection(video_id, collection_id):
+    db = get_db()
+
     try:
         db.execute(
             "INSERT INTO videocollectionmembership (videoid, collectionid) VALUES (?, ?)",
-            (videokey,1),
+            (video_id,collection_id),
         )
         db.commit()
-    except db.IntegrityError:
-        print("oops")
+    except db.IntegrityError as db_error:
+        print("{}".format(db_error))
     else:
-        pass
+        print(bcolors.OKGREEN + "Added video to \"All Videos\" category" + bcolors.ENDC)
