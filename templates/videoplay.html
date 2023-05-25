@@ -3,7 +3,7 @@
 
   {% block content %}
   <!-- !PAGE CONTENT! -->
-  <div class="w3-center">
+  <div class="center">
   
     {% for video in videos %}
       <h1>ID: <a href="{{ url_for('videos.viewvideo', video_id=video['id']) }}">{{ video['id'] }}</a></h1>
