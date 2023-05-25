@@ -35,7 +35,7 @@ def load_video(video_id):
     return send_from_directory(dir_name, file_name)
 
 
-#TODO: Decouple dl function with playlist function? Or maybe keep it as it is to avoid doing the job for yt-dlp which will download playlists better anyway
+#Gets video or playlist by link, automatically generates collection for playlists, and adds videos to respective collections
     #'title': 'recipes', 'playlist_count': 8, '_type': 'playlist', 'entries': [{'id': 'J305fi3nZ68', 'title':...}]
     #'_type' will be 'video' for single videos
 @bp.cli.command("dl")
@@ -97,12 +97,12 @@ def registervideo(dict, locdict, collection_destination = None):
 
     try:
         cursor.execute(
-            "INSERT INTO video (shorturl, loc, downloaded, title, width, height, descr, resolution) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT OR IGNORE INTO video (shorturl, loc, downloaded, title, width, height, descr, resolution) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (dict['id'], loc, 1, dict['title'], dict['width'], dict['height'], dict['description'], dict['resolution']),
         )
         db.commit()
-    except db.IntegrityError as db_error:
-        print(bcolors.WARNING + "Problem adding video. Has the video already been downloaded?" + bcolors.ENDC)
+    except db.IntegrityError as db_error: #This will rarely be called because of the IGNORE SQL statement.
+        print(bcolors.WARNING + "Problem adding video. Has the video already been downloaded? Carrying on..." + bcolors.ENDC)
         print("{}".format(db_error))
     else:
         print("Adding video to collection \"All videos\"")
@@ -111,6 +111,7 @@ def registervideo(dict, locdict, collection_destination = None):
             print("Adding video to collection " + collection_destination)
             addvideotocollection(cursor.lastrowid, findcollectionid(collection_destination))
 
+#Assigns a video to a collection
 def addvideotocollection(video_id, collection_id):
     db = get_db()
 
@@ -125,22 +126,21 @@ def addvideotocollection(video_id, collection_id):
     else:
         print(bcolors.OKGREEN + "Done." + bcolors.ENDC)
 
-#TODO: FINISH AUTOMATIC PLAYLIST DL AS A SEPARATE FUNCTION?
+#Creates a collection with a given name
 def createcollection(name = "", shorturl = None):
     db = get_db()
     cursor = db.cursor()
     
     try:
         cursor.execute(
-            "INSERT INTO videocollection (vcname, shorturl) VALUES (?,?)",
+            "INSERT OR IGNORE INTO videocollection (vcname, shorturl) VALUES (?,?)",
             (name, shorturl),
         )
         db.commit()
-    except db.IntegrityError as db_error:
+    except db.IntegrityError as db_error: #This will rarely be called because of the IGNORE SQL statement.
         print("{}".format(db_error))
     else:
         print(bcolors.OKGREEN + "Collection created." + bcolors.ENDC)
-        pass
 
 #This method finds a collection id by name. Maybe Names should be the key.
 def findcollectionid(name):
