@@ -16,7 +16,7 @@ CREATE TABLE video (
 
 CREATE TABLE videocollection (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    vcname TEXT NOT NULL,
+    vcname TEXT UNIQUE NOT NULL,
     shorturl TEXT DEFAULT "" --Collections are treated locally to nullify same video redownload, therefore shorturl can be null
 );
 

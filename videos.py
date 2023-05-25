@@ -41,7 +41,8 @@ def load_video(video_id):
 @bp.cli.command("dl")
 @click.argument("link")
 def dl(link):
-
+    db = get_db()
+    
     locdict = {
         'home' : os.getcwd() + '\\videos\\'
     }
@@ -71,16 +72,12 @@ def dl(link):
                 try:
                     subdct = {key: dict_dump[key] for key in keys}
                     ydl.download(link)
-                    collectiontitle = None
-
-                    #Create collection from playlist
-                    try:
-                        collectiontitle = subdct['title']
+                    collectiontitle = subdct['title']
+                    
+                    if findcollectionid(collectiontitle) == None:
                         createcollection(collectiontitle, subdct['id'])
-                    except db.IntegrityError as db_error:
-                        print(bcolors.WARNING + "Problem creating collection. Perhaps it already exists? Videos will be added." + bcolors.ENDC)
-                        print("{}".format(db_error))
-
+                    else:
+                        print("Collection already exists. Appending video to it.")
                     #Try to register each video individually
                     for entry in subdct['entries']:
                         registervideo(entry, locdict, collectiontitle)
@@ -108,10 +105,11 @@ def registervideo(dict, locdict, collection_destination = None):
         print(bcolors.WARNING + "Problem adding video. Has the video already been downloaded?" + bcolors.ENDC)
         print("{}".format(db_error))
     else:
-        addvideotocollection(cursor.lastrowid, 1) #TODO: Remove "All Videos" category hardcode?
+        print("Adding video to collection \"All videos\"")
+        addvideotocollection(cursor.lastrowid, findcollectionid("All videos")) #TODO: Remove "All Videos" category hardcode?
         if collection_destination != None:
-            pass #FIND collection id by title
-                #THEN add
+            print("Adding video to collection " + collection_destination)
+            addvideotocollection(cursor.lastrowid, findcollectionid(collection_destination))
 
 def addvideotocollection(video_id, collection_id):
     db = get_db()
@@ -125,7 +123,7 @@ def addvideotocollection(video_id, collection_id):
     except db.IntegrityError as db_error:
         print("{}".format(db_error))
     else:
-        print(bcolors.OKGREEN + "Added video to \"All Videos\" category" + bcolors.ENDC)
+        print(bcolors.OKGREEN + "Done." + bcolors.ENDC)
 
 #TODO: FINISH AUTOMATIC PLAYLIST DL AS A SEPARATE FUNCTION?
 def createcollection(name = "", shorturl = None):
@@ -143,3 +141,15 @@ def createcollection(name = "", shorturl = None):
     else:
         print(bcolors.OKGREEN + "Collection created." + bcolors.ENDC)
         pass
+
+#This method finds a collection id by name. Maybe Names should be the key.
+def findcollectionid(name):
+    db = get_db()
+
+    collection = db.execute('SELECT id FROM videocollection WHERE videocollection.vcname = \'' + name + '\''
+    ).fetchone()
+
+    if collection == None:
+        return None
+    else:
+        return collection['id']
