@@ -2,13 +2,14 @@
 
 {% block content %}
 
-  <div class="row">
-    {% for video in videos %}
-    <div class="column">
-      <img src="img_snow.jpg" alt="Snow" style="width:60%">
-      <h1>ID: <a href="{{ url_for('videos.viewvideo', video_id=video['id']) }}">{{ video['id'] }}</a></h1>
-      <p>SHURL: {{ video['shorturl'] }}, LOC: {{ video['loc'] }}, DWNLED: {{ video['downloaded'] }}</p>
-    </div>
+{% for video in videos %}
+<div class="responsive">
+  <div class="gallery">
+    <a href="{{ url_for('videos.viewvideo', video_id=video['id']) }}">
+      <img src="{{ url_for('static', filename='img_snow.jpg') }}" alt="Cinque Terre" width="600" height="400">
+    </a>
+    <div class="desc">{{ video['id'] }} {{ video['title'] }}</div>
   </div>
-  {% endfor %}
+</div>
+{% endfor %}
 {% endblock %}
