@@ -34,6 +34,24 @@ def load_video(video_id):
 
     return send_from_directory(dir_name, file_name)
 
+#TODO: If this works, merge with load_video to save half the IO calls.
+@bp.route("/video/source/thumb/<int:video_id>")
+def load_picture(video_id):
+    db = get_db()
+    video = db.execute('SELECT shorturl, loc FROM video WHERE video.id = ' + str(video_id)
+    ).fetchone()
+
+    videolocation = video['loc']
+    videoshorturl = video['shorturl']
+
+    #TODO: Check if the file even exists, and cycle through formats. This is just to test.
+    imagename = videoshorturl + ".webp"
+    dirname = os.path.dirname(videolocation)
+
+    return send_from_directory(dirname, imagename)
+
+
+
 
 #Gets video or playlist by link, automatically generates collection for playlists, and adds videos to respective collections
     #'title': 'recipes', 'playlist_count': 8, '_type': 'playlist', 'entries': [{'id': 'J305fi3nZ68', 'title':...}]
@@ -42,14 +60,18 @@ def load_video(video_id):
 @click.argument("link")
 def dl(link):
     db = get_db()
+
+    pathdicts = {
+        'locdict' : {
+            'home' : os.getcwd() + '\\videos\\'
+        },
+        'outputtemplatedict' : {
+            'default' : "%(id)s.%(ext)s"
+        }
+    }
     
-    locdict = {
-        'home' : os.getcwd() + '\\videos\\'
-    }
-    output_template_dic = {
-        'default' : "%(id)s.%(ext)s"
-    }
-    ytdlp_options = {'paths' : locdict, 'outtmpl' : output_template_dic, 'format': 'mp4'}
+    #There is no way to specify thumbnail format in embedded mode to my knowledge, and 'write_all_thumbnails' : output_template_dic is too redundant.
+    ytdlp_options = {'paths' : pathdicts['locdict'], 'outtmpl' : pathdicts['outputtemplatedict'], 'format': 'mp4', 'writethumbnail' : True}
 
     with YoutubeDL(ytdlp_options) as ydl:
         info = ydl.extract_info(link, download=False)
@@ -62,7 +84,7 @@ def dl(link):
                 try:
                     subdct = {key: dict_dump[key] for key in keys}
                     ydl.download(link)
-                    registervideo(subdct, locdict)
+                    registervideo(subdct, pathdicts['locdict'])
                 except KeyError as keyerror:
                     print(bcolors.WARNING + "Problem adding video." + bcolors.ENDC)
                     print("{}".format(keyerror))
@@ -80,7 +102,7 @@ def dl(link):
                         print("Collection already exists. Appending video to it.")
                     #Try to register each video individually
                     for entry in subdct['entries']:
-                        registervideo(entry, locdict, collectiontitle)
+                        registervideo(entry, pathdicts['locdict'], collectiontitle)
                 except KeyError as keyerror:
                     print(bcolors.WARNING + "Problem adding video." + bcolors.ENDC)
                     print("{}".format(keyerror))

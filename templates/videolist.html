@@ -6,9 +6,9 @@
 <div class="responsive">
   <div class="gallery">
     <a href="{{ url_for('videos.viewvideo', video_id=video['id']) }}">
-      <img src="{{ url_for('static', filename='img_snow.jpg') }}" alt="Cinque Terre" width="600" height="400">
+      <img src="{{ url_for('videos.load_picture', video_id=video['id']) }}" alt="thumbnail not found" width="600" height="400" >
     </a>
-    <div class="desc">{{ video['id'] }} {{ video['title'] }}</div>
+    <div class="desc"><b> {{ video['title'] }} </b></div>
   </div>
 </div>
 {% endfor %}
