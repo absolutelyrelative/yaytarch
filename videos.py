@@ -1,11 +1,13 @@
-import functools, click
+import functools
+import click
 from yt_dlp import YoutubeDL
 from .tools import bcolors
-
+from .model import video as videomodel
+from .model import collection as collectionmodel
+from .model import videocollectionmembership as videocollectionmembershipmodel
 from flask import (
     Blueprint, flash, g, redirect, render_template, request, url_for, send_from_directory
 )
-
 from yaytarch.db import get_db
 import os
 
@@ -13,36 +15,28 @@ import os
 
 bp = Blueprint('videos', __name__)
 
-@bp.route('/video/<int:video_id>')
-def viewvideo(video_id):
-    db = get_db()
+@bp.route('/video/<int:videoid>')
+def viewvideo(videoid):
+    video = videomodel.getvideobyid(videoid)
 
-    videos = db.execute('SELECT * FROM video WHERE video.id = ' + str(video_id)
-    ).fetchall()
+    return render_template('videoplay.html', video = video)
 
-    return render_template('videoplay.html', videos = videos)
+@bp.route("/video/source/<int:videoid>")
+def load_video(videoid):
+    video = videomodel.getvideobyid(videoid)
 
-@bp.route("/video/source/<int:video_id>")
-def load_video(video_id):
-    db = get_db()
-    video = db.execute('SELECT loc FROM video WHERE video.id = ' + str(video_id)
-    ).fetchone()
-    location_from_db = video['loc']
-
-    file_name = os.path.basename(location_from_db)
-    dir_name = os.path.dirname(location_from_db)
+    file_name = os.path.basename(video.loc)
+    dir_name = os.path.dirname(video.loc)
 
     return send_from_directory(dir_name, file_name)
 
 #TODO: If this works, merge with load_video to save half the IO calls.
-@bp.route("/video/source/thumb/<int:video_id>")
-def load_picture(video_id):
-    db = get_db()
-    video = db.execute('SELECT shorturl, loc FROM video WHERE video.id = ' + str(video_id)
-    ).fetchone()
+@bp.route("/video/source/thumb/<int:videoid>")
+def load_picture(videoid):
+    video = videomodel.getvideobyid(videoid)
 
-    videolocation = video['loc']
-    videoshorturl = video['shorturl']
+    videolocation = video.loc
+    videoshorturl = video.shorturl
 
     #TODO: Check if the file even exists, and cycle through formats. This is just to test.
     imagename = videoshorturl + ".webp"
@@ -50,9 +44,7 @@ def load_picture(video_id):
 
     return send_from_directory(dirname, imagename)
 
-
-
-
+#DEPRECATED
 #Gets video or playlist by link, automatically generates collection for playlists, and adds videos to respective collections
     #'title': 'recipes', 'playlist_count': 8, '_type': 'playlist', 'entries': [{'id': 'J305fi3nZ68', 'title':...}]
     #'_type' will be 'video' for single videos
@@ -109,6 +101,7 @@ def dl(link):
             case _: #may be required for other platforms
                 pass
 
+#DEPRECATED
 #Creates Video entry and registers to specified collection
 #TODO: ADD "collection destination" function parameter to call if specified
 def registervideo(dict, locdict, collection_destination = None):
@@ -128,11 +121,12 @@ def registervideo(dict, locdict, collection_destination = None):
         print("{}".format(db_error))
     else:
         print("Adding video to collection \"All videos\"")
-        addvideotocollection(cursor.lastrowid, findcollectionid("All videos")) #TODO: Remove "All Videos" category hardcode?
+        addvideotocollection(cursor.lastrowid, findcollectionid("All videos"))
         if collection_destination != None:
             print("Adding video to collection " + collection_destination)
             addvideotocollection(cursor.lastrowid, findcollectionid(collection_destination))
 
+#DEPRECATED
 #Assigns a video to a collection
 def addvideotocollection(video_id, collection_id):
     db = get_db()
@@ -148,6 +142,7 @@ def addvideotocollection(video_id, collection_id):
     else:
         print(bcolors.OKGREEN + "Done." + bcolors.ENDC)
 
+#DEPRECATED
 #Creates a collection with a given name
 def createcollection(name = "", shorturl = None):
     db = get_db()
@@ -164,6 +159,7 @@ def createcollection(name = "", shorturl = None):
     else:
         print(bcolors.OKGREEN + "Collection created." + bcolors.ENDC)
 
+#DEPRECATED
 #This method finds a collection id by name. Maybe Names should be the key.
 def findcollectionid(name):
     db = get_db()

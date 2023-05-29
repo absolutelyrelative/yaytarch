@@ -5,18 +5,14 @@
   <!-- !PAGE CONTENT! -->
   <div class="center">
   
-    {% for video in videos %}
     <center>
-      <h1>{{ video['title'] }}</h1>
+      <h1>{{ video.title }}</h1>
           <video width="600" height="400" controls>
-            <source src="{{ url_for('videos.load_video', video_id=video['id']) }}" type="video/mp4">
+            <source src="{{ url_for('videos.load_video', videoid=video.id) }}" type="video/mp4">
             Your browser does not support the video tag.
           </video>
-          <div class="about" style="padding:6px;"> SHURL: {{ video['shorturl'] }} <br> Description: {{ video['descr'] }} </div></center>
-    {% if not loop.last %}
+          <div class="about" style="padding:6px;"> SHURL: {{ video.shorturl }} <br> Description: {{ video.descr }} </div></center>
         <hr>
-      {% endif %}
-    {% endfor %}
   <!-- End page content -->
   </div>
   {% endblock %}

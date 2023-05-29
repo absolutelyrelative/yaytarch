@@ -4,10 +4,10 @@
 {% for collection in collections %}
 <div class="responsive">
   <div class="gallery">
-    <a href="{{ url_for('collections.viewcollection', collection_id=collection['id']) }}">
+    <a href="{{ url_for('collections.viewcollection', collectionid=collection.id) }}">
       <img src="{{ url_for('static', filename='img_snow.jpg') }}" alt="Cinque Terre" width="600" height="400">
     </a>
-    <div class="desc"><b>{{ collection['vcname'] }}</b><br> short url: <br><small>{{ collection['shorturl'] }}</small></div>
+    <div class="desc"><b>{{ collection.vcname }}</b><br> short url: <br><small>{{ collection.shorturl }}</small></div>
   </div>
 </div>
 
