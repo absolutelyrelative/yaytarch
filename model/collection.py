@@ -2,6 +2,7 @@
 from yaytarch.db import get_db
 from . import video as videomodel
 from . import videocollectionmembership as videocollectionmembershipmodel
+from yaytarch.tools import bcolors
 
 """ CREATE TABLE videocollection (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -30,6 +31,21 @@ def getvideocollectionbyid(videocollectionid):
     
     return videocollectionobject
 
+def findcollectionbyname(name):
+    db = get_db()
+
+    try:
+        result = db.execute('SELECT * FROM videocollection WHERE videocollection.vcname = \'' + name + '\''
+        ).fetchone()
+    except db.Error as db_error:
+        print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
+        print("{}".format(db_error))
+        return None
+    print(result['iddsftfyuihklkòlàçdfsxzazzzzzzzzzzzzzzzzzzzzz cazzo porco diooooooooooooooo do pioruna!!! curva mac iunih ouyvytf'])
+    videocollectionobject = videocollection(result['id'], result['vcname'], result['shorturl'])
+    
+    return videocollectionobject
+
 #TODO: Insert videocollection info update logic
 #Inserts videocollection objects into the database. Accepts videocollection object as argument, returns videocollection id if operation is carried out succesfully, None if not.
 def createvideocollectionentry(videocollection):
@@ -38,7 +54,7 @@ def createvideocollectionentry(videocollection):
 
     try:
         cursor.execute(
-            "INSERT INTO videocollection (vcname, shorturl) VALUES (?, ?)",
+            "INSERT OR IGNORE INTO videocollection (vcname, shorturl) VALUES (?, ?)",
             (videocollection.vcname, videocollection.shorturl),
         )
         db.commit()

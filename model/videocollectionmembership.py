@@ -2,6 +2,7 @@
 from yaytarch.db import get_db
 from . import video as videomodel
 from . import collection as collectionmodel
+from yaytarch.tools import bcolors
 
 """ CREATE TABLE videocollectionmembership (
     videoid INTEGER NOT NULL,
@@ -59,7 +60,7 @@ def createvideocollectionmembershipentry(videoid, collectionid):
 
     try:
         cursor.execute(
-            "INSERT INTO videocollectionmembership (videoid, collectionid) VALUES (?, ?)",
+            "INSERT OR IGNORE INTO videocollectionmembership (videoid, collectionid) VALUES (?, ?)",
             (videoid, collectionid),
         )
         db.commit()

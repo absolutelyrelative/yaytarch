@@ -88,8 +88,9 @@ def dl(link):
                     ydl.download(link)
                     collectiontitle = subdct['title']
                     
-                    if findcollectionid(collectiontitle) == None:
-                        createcollection(collectiontitle, subdct['id'])
+                    if collectionmodel.findcollectionbyname(collectiontitle) == None:
+                        newcollection = collectionmodel.videocollection(0, collectiontitle, subdct['id'])
+                        collectionmodel.createvideocollectionentry(newcollection)
                     else:
                         print("Collection already exists. Appending video to it.")
                     #Try to register each video individually
@@ -101,73 +102,24 @@ def dl(link):
             case _: #may be required for other platforms
                 pass
 
-#DEPRECATED
 #Creates Video entry and registers to specified collection
-#TODO: ADD "collection destination" function parameter to call if specified
 def registervideo(dict, locdict, collection_destination = None):
-    db = get_db()
-    cursor = db.cursor()
     loc = locdict['home'] + dict['id'] + '.' + dict['ext']
     print('location: ' + loc)
 
-    try:
-        cursor.execute(
-            "INSERT OR IGNORE INTO video (shorturl, loc, downloaded, title, width, height, descr, resolution) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (dict['id'], loc, 1, dict['title'], dict['width'], dict['height'], dict['description'], dict['resolution']),
-        )
-        db.commit()
-    except db.IntegrityError as db_error: #This will rarely be called because of the IGNORE SQL statement.
-        print(bcolors.WARNING + "Problem adding video. Has the video already been downloaded? Carrying on..." + bcolors.ENDC)
-        print("{}".format(db_error))
+    #def __init__(self, id, shorturl, title, width, height, loc, descr, resolution, downloaded):
+    videoobject = videomodel.video(0,dict['id'], dict['title'], dict['width'], dict['height'], loc, dict['description'], dict['resolution'],1)
+    newvideoid = videomodel.createvideoentry(videoobject)
+
+    newrecordid = videomodel.addvideotocollection(newvideoid, collectionmodel.findcollectionbyname("All videos").id)
+    if newrecordid != None:
+        print("Added video to collection \"All videos\"")
     else:
-        print("Adding video to collection \"All videos\"")
-        addvideotocollection(cursor.lastrowid, findcollectionid("All videos"))
-        if collection_destination != None:
+        print("Couldn't add video to 'All videos' collection")
+
+    if collection_destination != None:
+        newrecordid = videomodel.addvideotocollection(newvideoid, collectionmodel.findcollectionbyname(collection_destination))
+        if newrecordid != None:
             print("Adding video to collection " + collection_destination)
-            addvideotocollection(cursor.lastrowid, findcollectionid(collection_destination))
-
-#DEPRECATED
-#Assigns a video to a collection
-def addvideotocollection(video_id, collection_id):
-    db = get_db()
-
-    try:
-        db.execute(
-            "INSERT INTO videocollectionmembership (videoid, collectionid) VALUES (?, ?)",
-            (video_id,collection_id),
-        )
-        db.commit()
-    except db.IntegrityError as db_error:
-        print("{}".format(db_error))
-    else:
-        print(bcolors.OKGREEN + "Done." + bcolors.ENDC)
-
-#DEPRECATED
-#Creates a collection with a given name
-def createcollection(name = "", shorturl = None):
-    db = get_db()
-    cursor = db.cursor()
-    
-    try:
-        cursor.execute(
-            "INSERT OR IGNORE INTO videocollection (vcname, shorturl) VALUES (?,?)",
-            (name, shorturl),
-        )
-        db.commit()
-    except db.IntegrityError as db_error: #This will rarely be called because of the IGNORE SQL statement.
-        print("{}".format(db_error))
-    else:
-        print(bcolors.OKGREEN + "Collection created." + bcolors.ENDC)
-
-#DEPRECATED
-#This method finds a collection id by name. Maybe Names should be the key.
-def findcollectionid(name):
-    db = get_db()
-
-    collection = db.execute('SELECT id FROM videocollection WHERE videocollection.vcname = \'' + name + '\''
-    ).fetchone()
-
-    if collection == None:
-        return None
-    else:
-        return collection['id']
+        else:
+            print("Couldn't add video to " + collection_destination + " collection")

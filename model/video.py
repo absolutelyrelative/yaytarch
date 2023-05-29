@@ -2,6 +2,7 @@
 from yaytarch.db import get_db
 from . import collection as collectionmodel
 from . import videocollectionmembership as videocollectionmembershipmodel
+from yaytarch.tools import bcolors
 
 """ CREATE TABLE video (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -44,6 +45,7 @@ def getvideobyid(videoid):
     return videoobject
 
 #TODO: Insert video info update logic
+#TODO: If video is already downloaded (UNIQUE constraint failed: video.loc) but not added to database, this will be a problem. Fix it.
 #Inserts video objects into the database. Accepts video object as argument, returns video id if operation is carried out succesfully, None if not.
 def createvideoentry(video):
     db = get_db()
@@ -51,12 +53,13 @@ def createvideoentry(video):
 
     try:
         cursor.execute(
-            "INSERT INTO video (shorturl, loc, downloaded, title, width, height, descr, resolution) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
+            "INSERT OR IGNORE INTO video (shorturl, loc, downloaded, title, width, height, descr, resolution) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
             (video.shorturl, video.loc, video.downloaded, video.title, video.width, video.height, video.descr, video.resolution),
         )
         db.commit()
     except db.IntegrityError as db_error: #This should only be called only if shorturl already exists.
-        print(bcolors.WARNING + "Video already exists. Ignoring." + bcolors.ENDC)
+        print("{}".format(db_error))
+        print(bcolors.WARNING + "Video already exists. Attempting to update database." + bcolors.ENDC)
     except db.Error as db_error:
         print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
         print("{}".format(db_error))
@@ -65,14 +68,14 @@ def createvideoentry(video):
     return None
 
 #Assigns a video to a collection. Accepts video id as argument, returns videocollectionmembership id if operation is carried out succesfully, None if not.
-def addvideotocollection(video_id, collection_id):
+def addvideotocollection(videoid, collectionid):
     db = get_db()
     cursor = db.cursor()
 
     try:
         db.execute(
-            "INSERT INTO videocollectionmembership (videoid, collectionid) VALUES (?, ?)",
-            (video_id,collection_id),
+            "INSERT OR IGNORE INTO videocollectionmembership (videoid, collectionid) VALUES (?, ?)",
+            (videoid,collectionid),
         )
         db.commit()
     except db.IntegrityError as db_error: #This should only be called only if shorturl already exists.
@@ -84,3 +87,18 @@ def addvideotocollection(video_id, collection_id):
         print(bcolors.OKGREEN + "Done." + bcolors.ENDC)
         return cursor.lastrowid
     return None
+
+def getvideobyshorturl(shorturl):
+    db = get_db()
+
+    try:
+        result = db.execute('SELECT * FROM video WHERE video.shorturl = ' + shorturl
+        ).fetchone()
+    except db.Error as db_error:
+        print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
+        print("{}".format(db_error))
+        return None
+    videoobject = video(result['id'], result['shorturl'], result['title'], result['width'], result['height'], result['loc'],
+                        result['descr'], result['resolution'], result['downloaded'])
+    
+    return videoobject
