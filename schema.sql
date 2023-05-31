@@ -22,7 +22,7 @@ CREATE TABLE videocollection (
 
 CREATE TABLE videocollectionmembership (
     videoid INTEGER NOT NULL,
-    collectionid INTEGER NOT NULL,
+    collectionid INTEGER NOT     NULL,
     FOREIGN KEY (videoid) REFERENCES video (id),
     FOREIGN KEY (collectionid) REFERENCES videocollection (id)
 );
