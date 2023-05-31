@@ -71,9 +71,11 @@ def dl(link):
                      'writethumbnail': True}
 
     with YoutubeDL(ytdlp_options) as ydl:
+        print(bcolors.OKCYAN + "Downloading and parsing information...\n" + bcolors.ENDC)
         info = ydl.extract_info(link, download=False)
         dict_dump = ydl.sanitize_info(info)
 
+        print(bcolors.OKCYAN + "Downloading videos...\n" + bcolors.ENDC)
         # Get video type
         match dict_dump['_type']:
             case 'video':  # single video
@@ -95,10 +97,11 @@ def dl(link):
                     collectiontitle = subdct['title']
 
                     if collectionmodel.findcollectionbyname(collectiontitle) == None:
+                        print(bcolors.OKCYAN + "Collection doesn't exist. Creating...\n" + bcolors.ENDC)
                         newcollection = collectionmodel.videocollection(0, collectiontitle, subdct['id'])
                         collectionmodel.createvideocollectionentry(newcollection)
                     else:
-                        print("Collection already exists. Appending video to it.")
+                        print(bcolors.OKCYAN + "Collection already exists. Appending video to it...\n" + bcolors.ENDC)
                     # Try to register each video individually
                     for entry in subdct['entries']:
                         registervideo(entry, pathdicts['locdict'], collectiontitle)
@@ -112,23 +115,24 @@ def dl(link):
 # Creates Video entry and registers to specified collection
 def registervideo(dict, locdict, collection_destination=None):
     loc = locdict['home'] + dict['id'] + '.' + dict['ext']
-    print('location: ' + loc)
 
-    #Create video object
+    # Create video object
     videoobject = videomodel.video(0, dict['id'], dict['title'], dict['width'], dict['height'], loc,
                                    dict['description'], dict['resolution'], 1)
-    videoobjecttoupdate = videomodel.getvideobyshorturl(dict['id']) #Check if video object already exists
-    if videoobjecttoupdate is None: # If video object is new, create it
+    videoobjecttoupdate = videomodel.getvideobyshorturl(dict['id'])  # Check if video object already exists
+    if videoobjecttoupdate is None:  # If video object is new, create it
         print("Doesn't exist")
         newvideoid = videomodel.createvideoentry(videoobject)
-    else: # If it's not new, update it
-        print("Exists") #TODO: Insert update logic function call here
+    else:  # If it's not new, update it
+        print("Exists")  # TODO: Insert update logic function call here
         newvideoid = videoobjecttoupdate.id
 
-
-    #Add the new video to collections
+    # Add the new video to collections
+    print(bcolors.OKCYAN + "Adding video to collection " + bcolors.BOLD + "All videos" + bcolors.ENDC, end=': ')
     videomodel.addvideotocollection(newvideoid, collectionmodel.findcollectionbyname("All videos").id)
 
     if collection_destination != None:
+        print(bcolors.OKCYAN + "Adding video to collection " + bcolors.BOLD + collection_destination + bcolors.ENDC,
+              end=': ')
         newrecordid = videomodel.addvideotocollection(newvideoid,
                                                       collectionmodel.findcollectionbyname(collection_destination).id)

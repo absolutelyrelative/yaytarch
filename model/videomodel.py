@@ -76,7 +76,7 @@ def addvideotocollection(videoid, collectionid):
     db = get_db()
     cursor = db.cursor()
 
-    if checkcollectionmembership(videoid, collectionid) is None: #New video in the collection
+    if checkcollectionmembership(videoid, collectionid) is None:  # New video in the collection
         try:
             db.execute(
                 "INSERT INTO videocollectionmembership (videoid, collectionid) VALUES ({0}, {1})".format(
@@ -112,7 +112,8 @@ def checkcollectionmembership(videoid, collectionid):
 
     try:
         result = db.execute("SELECT * FROM videocollectionmembership  WHERE videoid = '" + str(videoid) + "'"
-                              "                                         AND collectionid = '" + str(collectionid) + "'"
+                                                                                                          "                                         AND collectionid = '" + str(
+            collectionid) + "'"
                             ).fetchone()
     except db.Error as db_error:
         print(bcolors.WARNING + "Database error:" + bcolors.ENDC)

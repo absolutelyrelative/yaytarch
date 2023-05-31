@@ -1,7 +1,6 @@
-import click
 import sqlite3
-import webbrowser
 
+import click
 from flask import current_app, g
 
 
