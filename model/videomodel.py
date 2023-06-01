@@ -1,6 +1,7 @@
-# This module provides a class object for videos and helper methods to fetch and insert videos. Any data coherence check should be done here.
+# This module provides a class object for videos and helper methods to fetch and insert videos. Any data coherence
+# check should be done here.
 from ..db import get_db
-from ..tools import bcolors
+from tools.outputformat import bcolors
 
 
 # """ CREATE TABLE video (
@@ -28,7 +29,8 @@ class video:
         self.downloaded = downloaded
 
 
-# Fetches video object from the database. Returns a video object if the operation is carried out succesfully, None if not.
+# Fetches video object from the database. Returns a video object if the operation is carried out succesfully,
+# None if not.
 def getvideobyid(videoid):
     db = get_db()
 
@@ -47,8 +49,9 @@ def getvideobyid(videoid):
 
 
 # TODO: Insert video info update logic
-# TODO: If video is already downloaded (UNIQUE constraint failed: video.loc) but not added to database, this will be a problem. Fix it.
-# Inserts video objects into the database. Accepts video object as argument, returns video id if operation is carried out succesfully, None if not.
+# TODO: If video is already downloaded (UNIQUE constraint failed: video.loc) but
+#  not added to database, this will be a problem. Fix it. Inserts video objects into the database. Accepts video
+#  object as argument, returns video id if operation is carried out succesfully, None if not.
 def createvideoentry(video):
     db = get_db()
     cursor = db.cursor()
@@ -71,7 +74,8 @@ def createvideoentry(video):
     return None
 
 
-# Assigns a video to a collection. Accepts video id as argument, returns videocollectionmembership id if operation is carried out succesfully, None if not.
+# Assigns a video to a collection. Accepts video id as argument, returns videocollectionmembership id if operation is
+# carried out succesfully, None if not.
 def addvideotocollection(videoid, collectionid):
     db = get_db()
     cursor = db.cursor()

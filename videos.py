@@ -9,7 +9,8 @@ from yt_dlp import YoutubeDL
 from .db import get_db
 from .model import collectionmodel
 from .model import videomodel
-from .tools import bcolors
+from tools.outputformat import bcolors
+from tools.config import *
 
 # This blueprint takes care of the video view page and any future feature of it
 
@@ -47,11 +48,11 @@ def load_picture(videoid):
 
     return send_from_directory(dirname, imagename)
 
-
-# DEPRECATED
-# Gets video or playlist by link, automatically generates collection for playlists, and adds videos to respective collections
-# 'title': 'recipes', 'playlist_count': 8, '_type': 'playlist', 'entries': [{'id': 'J305fi3nZ68', 'title':...}]
-# '_type' will be 'video' for single videos
+# TODO: Move all config to tools/config.py
+# Gets video or playlist by link, automatically generates collection for playlists, and adds videos to
+# respective collections
+# 'title': 'recipes', 'playlist_count': 8, '_type': 'playlist', 'entries': [{'id':
+# 'J305fi3nZ68', 'title':...}] '_type' will be 'video' for single videos
 @bp.cli.command("dl")
 @click.argument("link")
 def dl(link):
@@ -65,10 +66,12 @@ def dl(link):
             'default': "%(id)s.%(ext)s"
         }
     }
-
-    # There is no way to specify thumbnail format in embedded mode to my knowledge, and 'write_all_thumbnails' : output_template_dic is too redundant.
+    # progress_hooks requires a list of functions
+    list = [dllogger().downloading, dllogger().finished, dllogger().error]
+    # There is no way to specify thumbnail format in embedded mode to my knowledge, and 'write_all_thumbnails' :
+    # output_template_dic is too redundant.
     ytdlp_options = {'paths': pathdicts['locdict'], 'outtmpl': pathdicts['outputtemplatedict'], 'format': 'mp4',
-                     'writethumbnail': True}
+                     'writethumbnail': True, 'logger': dllogger(), 'progress_hooks': list}
 
     with YoutubeDL(ytdlp_options) as ydl:
         print(bcolors.OKCYAN + "Downloading and parsing information...\n" + bcolors.ENDC)

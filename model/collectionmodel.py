@@ -1,12 +1,14 @@
-# This module provides a class object for videocollection and helper methods to fetch and insert video collections. Any data coherence check should be done here.
+# This module provides a class object for videocollection and helper methods to fetch and insert video collections.
+# Any data coherence check should be done here.
 from ..db import get_db
-from ..tools import bcolors
+from tools.outputformat import bcolors
 
 
 # CREATE TABLE videocollection (
 #    id INTEGER PRIMARY KEY AUTOINCREMENT,
 #    vcname TEXT UNIQUE NOT NULL,
-#    shorturl TEXT DEFAULT "" --Collections are treated locally to nullify same video redownload, therefore shorturl can be null
+#    shorturl TEXT DEFAULT ""
+#    --Collections are treated locally to nullify same video redownload, therefore shorturl can be null
 # );
 
 class videocollection:
@@ -16,7 +18,8 @@ class videocollection:
         self.shorturl = shorturl
 
 
-# Fetches videocollection object from the database. Returns a videocollection object if the operation is carried out succesfully, None if not.
+# Fetches videocollection object from the database. Returns a videocollection object if the operation is carried out
+# succesfully, None if not.
 def getvideocollectionbyid(videocollectionid):
     db = get_db()
 
@@ -49,8 +52,8 @@ def findcollectionbyname(name):
         return None
 
 
-# TODO: Insert videocollection info update logic
-# Inserts videocollection objects into the database. Accepts videocollection object as argument, returns videocollection id if operation is carried out succesfully, None if not.
+# TODO: Insert videocollection info update logic Inserts videocollection objects into the database. Accepts
+#  videocollection object as argument, returns videocollection id if operation is carried out succesfully, None if not.
 def createvideocollectionentry(videocollection):
     db = get_db()
     cursor = db.cursor()

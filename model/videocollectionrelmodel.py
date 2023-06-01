@@ -2,7 +2,7 @@
 from . import collectionmodel
 from . import videomodel
 from ..db import get_db
-from ..tools import bcolors
+from tools.outputformat import bcolors
 
 
 # CREATE TABLE videocollectionmembership (
@@ -57,8 +57,9 @@ def getvideocollectionmembershipbyid(id, type="VIDEO"):
     return objectlist
 
 
-# TODO: Insert videocollectionmembership info update logic
-# Inserts videocollectionmembership objects into the database. Accepts videoid and collectionid object as argument, returns videocollectionmembership id if operation is carried out succesfully, None if not.
+# TODO: Insert videocollectionmembership info update logic Inserts videocollectionmembership objects into the
+#  database. Accepts videoid and collectionid object as argument, returns videocollectionmembership id if operation
+#  is carried out succesfully, None if not.
 def createvideocollectionmembershipentry(videoid, collectionid):
     db = get_db()
     cursor = db.cursor()
