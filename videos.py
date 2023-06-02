@@ -2,14 +2,14 @@ import os
 
 import click
 from flask import (
-    Blueprint, render_template, send_from_directory
+    Blueprint, render_template, send_from_directory, request, flash
 )
 from yt_dlp import YoutubeDL
 
+from .model import videocollectionrelmodel
 from .db import get_db
 from .model import collectionmodel
 from .model import videomodel
-from tools.outputformat import bcolors
 from tools.config import *
 
 # This blueprint takes care of the video view page and any future feature of it
@@ -17,11 +17,23 @@ from tools.config import *
 bp = Blueprint('videos', __name__)
 
 
-@bp.route('/video/<int:videoid>')
+# TODO: Remove ability to remove videos from "All Collections"?
+@bp.route('/video/<int:videoid>', methods=['GET', 'POST'])
 def viewvideo(videoid):
+    if request.method == 'POST':
+        if 'valueR' in request.form.keys():  # Remove from playlist buttom
+            message = videocollectionrelmodel.removevideocollectionmembershipentry(videoid, request.form['valueR'])
+        if 'value' in request.form.keys():  # Add to playlist button
+            if videomodel.addvideotocollection(videoid, request.form['value']) is not None:
+                message = "Video added to collection"
+            else:
+                message = "Video already part of collection."
+    # Fetch all collections the video is in to display values
+    incollections = videocollectionrelmodel.getvideocollectionmembershipbyid(videoid)
+    # Fetch all collections the video is NOT in to display values
+    notincollections = videocollectionrelmodel.getinversedvideocollectionmembershipbyid(videoid)
     video = videomodel.getvideobyid(videoid)
-
-    return render_template('videoplay.html', video=video)
+    return render_template('videoplay.html', video=video, incollections=incollections, notincollections = notincollections)
 
 
 @bp.route("/video/source/<int:videoid>")
@@ -48,6 +60,7 @@ def load_picture(videoid):
 
     return send_from_directory(dirname, imagename)
 
+
 # TODO: Move all config to tools/config.py
 # Gets video or playlist by link, automatically generates collection for playlists, and adds videos to
 # respective collections
@@ -57,23 +70,9 @@ def load_picture(videoid):
 @click.argument("link")
 def dl(link):
     db = get_db()
+    opts = DlOptions
 
-    pathdicts = {
-        'locdict': {
-            'home': os.getcwd() + '\\videos\\'
-        },
-        'outputtemplatedict': {
-            'default': "%(id)s.%(ext)s"
-        }
-    }
-    # progress_hooks requires a list of functions
-    list = [dllogger().downloading, dllogger().finished, dllogger().error]
-    # There is no way to specify thumbnail format in embedded mode to my knowledge, and 'write_all_thumbnails' :
-    # output_template_dic is too redundant.
-    ytdlp_options = {'paths': pathdicts['locdict'], 'outtmpl': pathdicts['outputtemplatedict'], 'format': 'mp4',
-                     'writethumbnail': True, 'logger': dllogger(), 'progress_hooks': list}
-
-    with YoutubeDL(ytdlp_options) as ydl:
+    with YoutubeDL(opts.ytdlp_options) as ydl:
         print(bcolors.OKCYAN + "Downloading and parsing information...\n" + bcolors.ENDC)
         info = ydl.extract_info(link, download=False)
         dict_dump = ydl.sanitize_info(info)
@@ -87,7 +86,7 @@ def dl(link):
                 try:
                     subdct = {key: dict_dump[key] for key in keys}
                     ydl.download(link)
-                    registervideo(subdct, pathdicts['locdict'])
+                    registervideo(subdct, opts.pathdicts['locdict'])
                 except KeyError as keyerror:
                     print(bcolors.WARNING + "Problem adding video." + bcolors.ENDC)
                     print("{}".format(keyerror))
@@ -107,7 +106,7 @@ def dl(link):
                         print(bcolors.OKCYAN + "Collection already exists. Appending video to it...\n" + bcolors.ENDC)
                     # Try to register each video individually
                     for entry in subdct['entries']:
-                        registervideo(entry, pathdicts['locdict'], collectiontitle)
+                        registervideo(entry, opts.pathdicts['locdict'], collectiontitle)
                 except KeyError as keyerror:
                     print(bcolors.WARNING + "Problem adding video." + bcolors.ENDC)
                     print("{}".format(keyerror))

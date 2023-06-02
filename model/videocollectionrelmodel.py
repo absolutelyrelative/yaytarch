@@ -56,7 +56,28 @@ def getvideocollectionmembershipbyid(id, type="VIDEO"):
 
     return objectlist
 
+# For specified video id, returns a list of collection objects that the video isn't in
+def getinversedvideocollectionmembershipbyid(videoid):
+    db = get_db()
+    objectlist = []
 
+    try:
+        result = db.execute(
+            "SELECT id FROM videocollection WHERE id NOT IN (SELECT collectionid FROM videocollectionmembership WHERE videocollectionmembership.videoid == ?)",
+            (videoid,),
+           ).fetchall()
+    except db.Error as db_error:
+        print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
+        print("{}".format(db_error))
+
+    # Create the video object list
+    for record in result:
+        collectionrecord = collectionmodel.getvideocollectionbyid(record['id'])
+        objectlist.append(collectionrecord)
+    return objectlist
+
+# DEPRECATED, USE VIDEOMODEL.addvideotocollection
+# TODO: REMOVE OTHER USES OF THIS FUNCTION
 # TODO: Insert videocollectionmembership info update logic Inserts videocollectionmembership objects into the
 #  database. Accepts videoid and collectionid object as argument, returns videocollectionmembership id if operation
 #  is carried out succesfully, None if not.
@@ -78,3 +99,22 @@ def createvideocollectionmembershipentry(videoid, collectionid):
     else:
         return cursor.lastrowid
     return None
+
+# Remove entry with specified videoid and collectionid. Returns message status of the operation.
+def removevideocollectionmembershipentry(videoid, collectionid):
+    db = get_db()
+
+    try:
+        db.execute(
+            "DELETE FROM videocollectionmembership WHERE videoid = ? AND collectionid = ?",
+            (videoid, collectionid),
+        )
+        db.commit()
+    except db.IntegrityError as db_error:
+        print(bcolors.WARNING + "Video not part of collection. Ignoring." + bcolors.ENDC)
+        return "Video not part of collection. Ignoring."
+    except db.Error as db_error:
+        print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
+        print("{}".format(db_error))
+        return "Database error. Check console for details."
+    return "Video removed from collection."

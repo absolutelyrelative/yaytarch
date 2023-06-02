@@ -4,7 +4,25 @@
   {% block content %}
   <!-- !PAGE CONTENT! -->
   <div class="center">
-  
+    <!-- Video playlist management !-->
+      <p style="display:inline">Add to collection:</p><form method="POST">
+      <select name="value" id="value">
+          {% for notincollections in notincollections %}
+            <option value="{{ notincollections.id }}">{{ notincollections.vcname }}</option>
+          {% endfor %}
+  </select><input type="submit" value="Add" id="button"></form>
+      <p style="display:inline">Remove from collection:</p><form method="POST">
+      <select name="valueR" id="valueR">
+          {% for incollection in incollections %}
+            <option value="{{ incollection.id }}">{{ incollection.vcname }}</option>
+          {% endfor %}
+  </select><input type="submit" value="Remove" id="buttonR"></form>
+
+  {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+
+    <!-- Video playlist management !-->
     <center>
       <h1>{{ video.title }}</h1>
           <video width="600" height="400" controls>

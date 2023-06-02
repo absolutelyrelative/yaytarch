@@ -2,10 +2,12 @@
 # self.params['logger'].warning(message)
 # self.params['logger'].error(message)
 # self.params['logger'].debug(message)
+import os
+
 from tools.outputformat import bcolors
 
 
-class dllogger:
+class DlLogger:
     def debug(self, *args):
         pass
 
@@ -52,3 +54,22 @@ class dllogger:
     #                        (with status "finished") if the download is successful.
     def finished(self, *args):
         print(bcolors.OKCYAN + "Finished" + bcolors.ENDC)
+
+
+# Function to generate and return ytdlp options
+class DlOptions:
+    # Paths dictionary
+    pathdicts = {
+        'locdict': {
+            'home': os.getcwd() + '\\videos\\'
+        },
+        'outputtemplatedict': {
+            'default': "%(id)s.%(ext)s"
+        }
+    }
+
+    # List to tidy up logs
+    loggerlist = [DlLogger().downloading, DlLogger().finished, DlLogger().error]
+
+    ytdlp_options = {'paths': pathdicts['locdict'], 'outtmpl': pathdicts['outputtemplatedict'], 'format': 'mp4',
+                     'writethumbnail': True, 'logger': DlLogger(), 'progress_hooks': loggerlist}
