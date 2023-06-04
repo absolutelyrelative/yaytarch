@@ -2,35 +2,34 @@
   {% extends 'base.html' %}
 
   {% block content %}
-  <!-- !PAGE CONTENT! -->
+      <br>
+    <!-- !PAGE CONTENT! -->
   <div class="center">
-    <!-- Video playlist management !-->
-      <p style="display:inline">Add to collection:</p><form method="POST">
-      <select name="value" id="value">
-          {% for notincollections in notincollections %}
-            <option value="{{ notincollections.id }}">{{ notincollections.vcname }}</option>
-          {% endfor %}
-  </select><input type="submit" value="Add" id="button"></form>
-      <p style="display:inline">Remove from collection:</p><form method="POST">
-      <select name="valueR" id="valueR">
-          {% for incollection in incollections %}
-            <option value="{{ incollection.id }}">{{ incollection.vcname }}</option>
-          {% endfor %}
-  </select><input type="submit" value="Remove" id="buttonR"></form>
+    <div class="flash">{{ message }}</div>
 
-  {% for message in get_flashed_messages() %}
+    <!-- Video playlist management !-->
+      <div class="video"> <!-- NEW !-->
+             {% for message in get_flashed_messages() %}
     <div class="flash">{{ message }}</div>
   {% endfor %}
-
-    <!-- Video playlist management !-->
     <center>
       <h1>{{ video.title }}</h1>
           <video width="600" height="400" controls>
             <source src="{{ url_for('videos.load_video', videoid=video.id) }}" type="video/mp4">
             Your browser does not support the video tag.
           </video>
-          <div class="about" style="padding:6px;"> SHURL: {{ video.shorturl }} <br> Description: {{ video.descr }} </div></center>
-        <hr>
+
+        <!-- Video playlist management !-->
+      <div class="playlistchoice">Add to collection:
+          <form method="POST"><select name="value" id="value">
+            {% for notincollections in notincollections %}<option value="{{ notincollections.id }}">{{ notincollections.vcname }}</option>{% endfor %}</select><input type="submit" value="Add" id="button"></form>
+      Remove from collection:<form method="POST">
+      <select name="valueR" id="valueR">
+          {% for incollection in incollections %}<option value="{{ incollection.id }}">{{ incollection.vcname }}</option>{% endfor %}</select><input type="submit" value="Remove" id="buttonR"></form>
+        </div>
+
+          <p> {{ video.descr }} </p></center>
+    </div>
   <!-- End page content -->
   </div>
   {% endblock %}
