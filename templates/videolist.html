@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+<div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a> <br></div>
 {% for video in videos %}
 <div class="responsive">
   <div class="gallery">

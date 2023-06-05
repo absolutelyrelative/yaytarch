@@ -1,6 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
+    <div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a>
+        <a style="float:right; text-decoration:none;" onclick="openForm()">➕</a> <br></div>
 {% for collection in collections %}
 <div class="responsive">
   <div class="gallery">
@@ -10,6 +12,23 @@
     <div class="desc"><b>{{ collection.vcname }}</b><br> short url: <br><small>{{ collection.shorturl }}</small></div>
   </div>
 </div>
-
   {% endfor %}
+
+    <div class="form-popup" id="myForm">
+  <form method="POST" class="form-container">
+    <label for="collectionname"><b>Create Collection</b></label><input type="text" placeholder="Collection name" name="collectionname" required>
+    <button type="submit" class="btn">Create</button>
+    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+  </form>
+</div>
+
+<script>
+function openForm() {
+  document.getElementById("myForm").style.display = "block";
+}
+
+function closeForm() {
+  document.getElementById("myForm").style.display = "none";
+}
+</script>
 {% endblock %}

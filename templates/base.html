@@ -3,8 +3,7 @@
   <head>
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
   </head>
-  <body>
-  <div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a> <br></div>
+  <body style="background-image: url({{ url_for('static', filename='bg.png') }})">
 
 
   {% block header %}{% endblock %}
