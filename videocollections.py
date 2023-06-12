@@ -16,20 +16,48 @@ bp = Blueprint('collections', __name__)
 @bp.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        if 'collectionname' in request.form.keys():  # Remove from playlist buttom
-            collectionname = request.form['collectionname']
+        # Request type: add
+        if 'collectionnametoadd' in request.form.keys():
+            collectionname = request.form['collectionnametoadd']
+            collectionurl = request.form['collectionurltoadd']
             # No collection with the name has been found
             if collectionmodel.findcollectionbyname(collectionname) is None:
-                newcollection = collectionmodel.videocollection(0,collectionname,"0") #New collection object
-                if collectionmodel.createvideocollectionentry(newcollection) is not None: #Collection created
+                # New collection object
+                newcollection = collectionmodel.videocollection(0, collectionname, collectionurl)
+
+                if collectionmodel.createvideocollectionentry(newcollection) is not None:  # Collection created
                     print(bcolors.OKGREEN + "Local collection created." + bcolors.ENDC)
                 else:
-                    print(bcolors.WARNING + "Could not create collection. Make sure it is not a duplicate name." + bcolors.ENDC)
+                    print(
+                        bcolors.WARNING + "Could not create collection. Make sure it is not a duplicate name." + bcolors.ENDC)
             # Collection with the name has been found
             else:
-                print(bcolors.WARNING + "Could not create collection. Make sure it is not a duplicate name." + bcolors.ENDC)
-    collections = collectionmodel.getallcollections()
+                print(
+                    bcolors.WARNING + "Could not create collection. Make sure it is not a duplicate name." + bcolors.ENDC)
 
+        # TODO: Create SQL to remove collection (pay attention to N to N relations)
+        # Request type: remove
+        if 'collectionnametoremove' in request.form.keys():
+            collectionname = request.form['collectionnametoremove']
+            collectionobj = collectionmodel.findcollectionbyname(collectionname)  # Fetch collection object from name
+            if collectionobj is not None:
+                # fetch videos from collection
+                videolist = videocollectionmembershipmodel.getvideocollectionmembershipbyid(collectionobj.id, "COLLECTION")
+                # attempt to move videos to "All Videos" playlist. Done outside the loop to save some computational power.
+                allvideoscollection = collectionmodel.findcollectionbyname("All videos")
+                for video in videolist:
+                    videocollectionmembershipmodel.createvideocollectionmembershipentry(video.id, allvideoscollection.id)
+
+                # attempt to remove all collection, video relationships and the collection entry itself
+                # TODO: PROBLEM IS HERE: parameters are of unsupported type (removeallcollectionentries), maybe second one too
+                if videocollectionmembershipmodel.removeallcollectionentries(collectionobj.id) is not None and collectionmodel.removecollection(collectionobj.id) is not None:
+                    print(bcolors.OKGREEN + "Collection removed." + bcolors.ENDC)
+                else:
+                    print(bcolors.WARNING + "Could not delete collection. Check terminal for more information." + bcolors.ENDC)
+
+
+
+    collections = collectionmodel.getallcollections()
     return render_template('collections.html', collections=collections)
 
 

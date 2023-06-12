@@ -16,3 +16,5 @@ build/
 list.txt
 .idea
 templates/Brackets
+
+identifier.sqlite

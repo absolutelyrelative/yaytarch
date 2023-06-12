@@ -92,3 +92,24 @@ def getallcollections():
         objectlist.append(collectionrecord)
 
     return objectlist
+
+
+# Removes collection from specified id. Returns message if completed,
+# prints error and returns None if not.
+def removecollection(collectionid):
+    db = get_db()
+
+    try:
+        db.execute(
+            "DELETE FROM videocollection WHERE id = ?",
+            (collectionid,),
+        )
+        db.commit()
+    except db.IntegrityError as db_error:
+        print(bcolors.WARNING + "Video not part of collection. Ignoring." + bcolors.ENDC)
+        return None
+    except db.Error as db_error:
+        print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
+        print("{}".format(db_error))
+        return None
+    return "Collection has been deleted."

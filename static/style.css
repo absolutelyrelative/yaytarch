@@ -200,3 +200,33 @@ div.gallery {
 .form-container .btn:hover, .open-button:hover {
   opacity: 1;
 }
+
+.buttonadd{
+    width: 23px;
+    height: 23px;
+    font-weight: bold;
+    color: black;
+    background-color: #00CA4E;
+    float: right;
+    border-radius: 50%;
+}
+
+.buttonremove{
+    width: 23px;
+    height: 23px;
+    font-weight: bold;
+    color: black;
+    background-color: #FF605C;
+    float: right;
+    border-radius: 50%;
+}
+
+.buttonrefresh{
+    width: 23px;
+    height: 23px;
+    font-weight: bold;
+    color: black;
+    background-color: #FFBD44;
+    float: right;
+    border-radius: 50%;
+}

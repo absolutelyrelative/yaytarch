@@ -2,7 +2,9 @@
 
 {% block content %}
     <div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a>
-        <a style="float:right; text-decoration:none;" onclick="openForm()">➕</a> <br></div>
+        <button class="buttonadd" onclick="openForm('add')">+</button>
+        <button class="buttonrefresh" onclick="openForm()">↻</button> <!-- TODO: Figure out how to POST on click -->
+        <button class="buttonremove" onclick="openForm('remove')">─</button><br></div>
 {% for collection in collections %}
 <div class="responsive">
   <div class="gallery">
@@ -14,21 +16,53 @@
 </div>
   {% endfor %}
 
-    <div class="form-popup" id="myForm">
+
+    <!-- Add collection form -->
+    <div class="form-popup" id="addform">
   <form method="POST" class="form-container">
-    <label for="collectionname"><b>Create Collection</b></label><input type="text" placeholder="Collection name" name="collectionname" required>
+    <label for="collectionname"><b>Create Collection</b></label>
+      <input type="text" placeholder="Collection name" name="collectionnametoadd" required>
+      <input type="text" placeholder="YT short url" name="collectionurltoadd">
     <button type="submit" class="btn">Create</button>
-    <button type="button" class="btn cancel" onclick="closeForm()">Close</button>
+    <button type="button" class="btn cancel" onclick="closeForm('add')">Close</button>
+  </form>
+</div>
+
+    <!-- Remove collection form -->
+    <div class="form-popup" id="removeform">
+  <form method="POST" class="form-container">
+    <label for="collectionname"><b>Remove Collection</b></label>
+      <input type="text" placeholder="Collection name" name="collectionnametoremove" required>
+    <button type="submit" class="btn">Remove</button>
+    <button type="button" class="btn cancel" onclick="closeForm('remove')">Close</button>
   </form>
 </div>
 
 <script>
-function openForm() {
-  document.getElementById("myForm").style.display = "block";
+function openForm(element) {
+    switch (element){
+        case 'add':
+            document.getElementById("addform").style.display = "block";
+            break;
+        case 'remove':
+            document.getElementById("removeform").style.display = "block";
+            break;
+        default:
+            break;
+    }
 }
 
-function closeForm() {
-  document.getElementById("myForm").style.display = "none";
+function closeForm(element) {
+    switch (element){
+        case 'add':
+            document.getElementById("addform").style.display = "none";
+            break;
+        case 'remove':
+            document.getElementById("removeform").style.display = "none";
+            break;
+        default:
+            break;
+    }
 }
 </script>
 {% endblock %}
