@@ -6,6 +6,7 @@ from flask import (
 
 from .model import collectionmodel
 from .model import videocollectionrelmodel as videocollectionmembershipmodel
+from .model import videomodel
 
 # This blueprint shows all the available collections and any future feature related to collections
 
@@ -46,7 +47,7 @@ def index():
                 # attempt to move videos to "All Videos" playlist. Done outside the loop to save some computational power.
                 allvideoscollection = collectionmodel.findcollectionbyname("All videos")
                 for video in videolist:
-                    videocollectionmembershipmodel.createvideocollectionmembershipentry(video.id, allvideoscollection.id)
+                    videomodel.addvideotocollection(video.id, allvideoscollection.id)
 
                 # attempt to remove all collection, video relationships and the collection entry itself
                 # TODO: PROBLEM IS HERE: parameters are of unsupported type (removeallcollectionentries), maybe second one too
