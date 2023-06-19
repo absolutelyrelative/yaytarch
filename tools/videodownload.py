@@ -1,74 +1,13 @@
 import os
-
-import click
-from flask import (
-    Blueprint, render_template, send_from_directory, request, flash
-)
 from yt_dlp import YoutubeDL
 
-from .model import videocollectionrelmodel
-from .db import get_db
-from .model import collectionmodel
-from .model import videomodel
+from model import videocollectionrelmodel
+from db import get_db
+from model import collectionmodel
+from model import videomodel
 from tools.config import *
 
-# This blueprint takes care of the video view page and any future feature of it
-
-bp = Blueprint('videos', __name__)
-
-
-# TODO: Remove ability to remove videos from "All Collections"?
-@bp.route('/video/<int:videoid>', methods=['GET', 'POST'])
-def viewvideo(videoid):
-    if request.method == 'POST':
-        if 'valueR' in request.form.keys():  # Remove from playlist buttom
-            message = videocollectionrelmodel.removevideocollectionmembershipentry(videoid, request.form['valueR'])
-        if 'value' in request.form.keys():  # Add to playlist button
-            if videomodel.addvideotocollection(videoid, request.form['value']) is not None:
-                message = "Video added to collection"
-            else:
-                message = "Video already part of collection."
-    # Fetch all collections the video is in to display values
-    incollections = videocollectionrelmodel.getvideocollectionmembershipbyid(videoid)
-    # Fetch all collections the video is NOT in to display values
-    notincollections = videocollectionrelmodel.getinversedvideocollectionmembershipbyid(videoid)
-    video = videomodel.getvideobyid(videoid)
-    return render_template('videoplay.html', video=video, incollections=incollections, notincollections = notincollections)
-
-
-@bp.route("/video/source/<int:videoid>")
-def load_video(videoid):
-    video = videomodel.getvideobyid(videoid)
-
-    file_name = os.path.basename(video.loc)
-    dir_name = os.path.dirname(video.loc)
-
-    return send_from_directory(dir_name, file_name)
-
-
-# TODO: If this works, merge with load_video to save half the IO calls.
-@bp.route("/video/source/thumb/<int:videoid>")
-def load_picture(videoid):
-    video = videomodel.getvideobyid(videoid)
-
-    videolocation = video.loc
-    videoshorturl = video.shorturl
-
-    # TODO: Check if the file even exists, and cycle through formats. This is just to test.
-    imagename = videoshorturl + ".webp"
-    dirname = os.path.dirname(videolocation)
-
-    return send_from_directory(dirname, imagename)
-
-
-# TODO: Move all config to tools/config.py. In progress!
-# Gets video or playlist by link, automatically generates collection for playlists, and adds videos to
-# respective collections
-# 'title': 'recipes', 'playlist_count': 8, '_type': 'playlist', 'entries': [{'id':
-# 'J305fi3nZ68', 'title':...}] '_type' will be 'video' for single videos
-@bp.cli.command("dl")
-@click.argument("link")
-def dl(link):
+def dl(link, collection_destination = None):
     db = get_db()
     opts = DlOptions
 
@@ -86,7 +25,7 @@ def dl(link):
                 try:
                     subdct = {key: dict_dump[key] for key in keys}
                     ydl.download(link)
-                    registervideo(subdct, opts.pathdicts['locdict'])
+                    registervideo(subdct, opts.pathdicts['locdict'], collection_destination)
                 except KeyError as keyerror:
                     print(bcolors.WARNING + "Problem adding video." + bcolors.ENDC)
                     print("{}".format(keyerror))

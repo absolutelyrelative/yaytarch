@@ -1,6 +1,6 @@
 # This module provides a class object for videocollection and helper methods to fetch and insert video collections.
 # Any data coherence check should be done here.
-from ..db import get_db
+from db import get_db
 from tools.outputformat import bcolors
 
 

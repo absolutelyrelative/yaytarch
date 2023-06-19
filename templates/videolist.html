@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a> <br></div>
+    <div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a>
+        <button class="buttonadd" onclick="openForm('add')">+</button>
+        <button class="buttonrefresh" onclick="openForm()">↻</button> <!-- TODO: Figure out how to POST on click -->
+    <br></div>
 {% for video in videos %}
 <div class="responsive">
   <div class="gallery">
@@ -12,4 +15,36 @@
   </div>
 </div>
 {% endfor %}
+
+<!-- Add video form -->
+    <div class="form-popup" id="addform">
+  <form method="POST" class="form-container">
+    <label for="videoname"><b>Add video</b></label>
+      <input type="text" placeholder="YT short url" name="videourl" required>
+    <button type="submit" class="btn">Add</button>
+    <button type="button" class="btn cancel" onclick="closeForm('add')">Close</button>
+  </form>
+</div>
+
+    <script>
+function openForm(element) {
+    switch (element){
+        case 'add':
+            document.getElementById("addform").style.display = "block";
+            break;
+        default:
+            break;
+    }
+}
+
+function closeForm(element) {
+    switch (element){
+        case 'add':
+            document.getElementById("addform").style.display = "none";
+            break;
+        default:
+            break;
+    }
+}
+</script>
 {% endblock %}

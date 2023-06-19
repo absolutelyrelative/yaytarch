@@ -1,12 +1,13 @@
 from tools.outputformat import bcolors
 from .model import collectionmodel
+from .model import collectionmodel
+from .model import videocollectionrelmodel as videocollectionmembershipmodel
+from .model import videomodel
+from .tools import videodownload
 from flask import (
     Blueprint, render_template, request
 )
 
-from .model import collectionmodel
-from .model import videocollectionrelmodel as videocollectionmembershipmodel
-from .model import videomodel
 
 # This blueprint shows all the available collections and any future feature related to collections
 
@@ -36,7 +37,6 @@ def index():
                 print(
                     bcolors.WARNING + "Could not create collection. Make sure it is not a duplicate name." + bcolors.ENDC)
 
-        # TODO: Create SQL to remove collection (pay attention to N to N relations)
         # Request type: remove
         if 'collectionnametoremove' in request.form.keys():
             collectionname = request.form['collectionnametoremove']
@@ -50,7 +50,6 @@ def index():
                     videomodel.addvideotocollection(video.id, allvideoscollection.id)
 
                 # attempt to remove all collection, video relationships and the collection entry itself
-                # TODO: PROBLEM IS HERE: parameters are of unsupported type (removeallcollectionentries), maybe second one too
                 if videocollectionmembershipmodel.removeallcollectionentries(collectionobj.id) is not None and collectionmodel.removecollection(collectionobj.id) is not None:
                     print(bcolors.OKGREEN + "Collection removed." + bcolors.ENDC)
                 else:
@@ -62,8 +61,17 @@ def index():
     return render_template('collections.html', collections=collections)
 
 
-@bp.route('/collection/<int:collectionid>')
+#TODO: Refactor with a more consistent argument passing
+@bp.route('/collection/<int:collectionid>', methods=['GET', 'POST'])
 def viewcollection(collectionid):
-    videos = videocollectionmembershipmodel.getvideocollectionmembershipbyid(collectionid, type="COLLECTION")
+    if request.method == 'POST':
+        try:
+            collectionname = collectionmodel.getvideocollectionbyid(collectionid).vcname
+        except:
+            print("Collection not found") #Temporary solution
+        if 'videourl' in request.form.keys():
+            videourl = request.form['videourl']
+            videodownload.dl(videourl, collectionname)
 
+    videos = videocollectionmembershipmodel.getvideocollectionmembershipbyid(collectionid, type="COLLECTION")
     return render_template('videolist.html', videos=videos)
