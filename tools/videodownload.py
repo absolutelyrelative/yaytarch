@@ -7,6 +7,11 @@ from model import collectionmodel
 from model import videomodel
 from tools.config import *
 
+
+# Gets video or playlist by link, automatically generates collection for playlists, and adds videos to
+# respective collections
+# 'title': 'recipes', 'playlist_count': 8, '_type': 'playlist', 'entries': [{'id':
+# 'J305fi3nZ68', 'title':...}] '_type' will be 'video' for single videos
 def dl(link, collection_destination = None):
     db = get_db()
     opts = DlOptions

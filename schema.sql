@@ -27,5 +27,13 @@ CREATE TABLE videocollectionmembership (
     FOREIGN KEY (collectionid) REFERENCES videocollection (id)
 );
 
+CREATE TABLE configuration (
+    downloadlocation TEXT DEFAULT "",
+    ytdlpargs TEXT DEFAULT "",
+    jsonargs TEXT DEFAULT ""
+);
+
 INSERT INTO videocollection(vcname, shorturl)
 VALUES ("All videos", "");
+INSERT INTO configuration(downloadlocation, ytdlpargs, jsonargs)
+VALUES ("","","");
