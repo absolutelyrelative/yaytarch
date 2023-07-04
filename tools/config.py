@@ -73,3 +73,12 @@ class DlOptions:
 
     ytdlp_options = {'paths': pathdicts['locdict'], 'outtmpl': pathdicts['outputtemplatedict'], 'format': 'mp4',
                      'writethumbnail': True, 'logger': DlLogger(), 'progress_hooks': loggerlist}
+
+
+class DlArguments:
+    videokeys = ['id', 'title', 'thumbnail', 'description', 'uploader_url', 'view_count', 'webpage_url', 'like_count',
+                 'availability', 'duration_string', 'ext', 'width', 'height', '_type', 'upload_date', 'channel',
+                 'epoch']
+
+    playlistkeys = ['id', 'title', 'availability', 'modified_date', 'playlist_count', 'uploader_url',
+                    '_type', 'epoch', 'entries']

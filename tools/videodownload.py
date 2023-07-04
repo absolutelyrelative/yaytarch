@@ -6,6 +6,7 @@ from db import get_db
 from model import collectionmodel
 from model import videomodel
 from tools.config import *
+import json
 
 
 # Gets video or playlist by link, automatically generates collection for playlists, and adds videos to
@@ -16,29 +17,49 @@ def dl(link, collection_destination = None):
     db = get_db()
     opts = DlOptions
 
-    with YoutubeDL(opts.ytdlp_options) as ydl:
-        print(bcolors.OKCYAN + "Downloading and parsing information...\n" + bcolors.ENDC)
+    with YoutubeDL(DlOptions.ytdlp_options) as ydl:
+        print(bcolors.OKCYAN + "Downloading & parsing information...\n" + bcolors.ENDC)
         info = ydl.extract_info(link, download=False)
-        dict_dump = ydl.sanitize_info(info)
+        dictdump = ydl.sanitize_info(info)
 
         print(bcolors.OKCYAN + "Downloading videos...\n" + bcolors.ENDC)
         # Get video type
-        match dict_dump['_type']:
+        match dictdump['_type']:
             case 'video':  # single video
-                keys = ['id', 'title', 'thumbnail', 'description', 'format', 'format_id', 'ext', 'width', 'height',
-                        'resolution']
                 try:
-                    subdct = {key: dict_dump[key] for key in keys}
+                    # Cycle through keys
+                    subdct = {key: dictdump[key] for key in DlArguments.videokeys}
+
+                    # Save to JSon
+                    infojson = json.dumps(subdct, indent='\t')
+                    print(infojson)
+
+                    # Download the video
                     ydl.download(link)
                     registervideo(subdct, opts.pathdicts['locdict'], collection_destination)
                 except KeyError as keyerror:
                     print(bcolors.WARNING + "Problem adding video." + bcolors.ENDC)
                     print("{}".format(keyerror))
 
+            # PROBLEM! ONLY this is called when playlists are found, it doesn't cycle through.
             case 'playlist':  # playlist
-                keys = ['id', 'title', 'playlist_count', '_type', 'entries']
                 try:
-                    subdct = {key: dict_dump[key] for key in keys}
+                    # Cycle through keys
+                    subdct = {key: dictdump[key] for key in DlArguments.playlistkeys}
+
+                    # Because of course the video entries in the playlist info don't share the same keys.
+                    for entry in subdct['entries']:
+                        # Redownload information
+                        info = ydl.extract_info(entry['id'], download=False)
+                        dictdump = ydl.sanitize_info(info)
+                        subdct = {key: dictdump[key] for key in DlArguments.videokeys}
+                        # Save to JSon
+                        infojson = json.dumps(subdct, indent='\t')
+
+                    # Save to JSon
+                    infojson = json.dumps(subdct, indent='\t')
+
+                    # Download the playlist
                     ydl.download(link)
                     collectiontitle = subdct['title']
 
