@@ -11,8 +11,6 @@ import json
 
 # Gets video or playlist by link, automatically generates collection for playlists, and adds videos to
 # respective collections
-# 'title': 'recipes', 'playlist_count': 8, '_type': 'playlist', 'entries': [{'id':
-# 'J305fi3nZ68', 'title':...}] '_type' will be 'video' for single videos
 def dl(link, collection_destination=None):
     db = get_db()
     opts = DlOptions
@@ -30,10 +28,6 @@ def dl(link, collection_destination=None):
                     # Cycle through keys
                     subdct = {key: dictdump[key] for key in DlArguments.videokeys}
 
-                    # Save to JSon
-                    infojson = json.dumps(subdct, indent='\t')
-                    print(infojson)
-
                     # Download the video
                     ydl.download(link)
                     registervideo(subdct, opts.pathdicts['locdict'], collection_destination)
@@ -46,10 +40,23 @@ def dl(link, collection_destination=None):
                 try:
                     # Cycle through keys
                     playlistsubdct = {key: dictdump[key] for key in DlArguments.playlistkeys}
+                    thumbnailssubdct = dictdump['thumbnails']
+
+                    # Extract downloaded thumbnail location
+                    thumbnailloc = ""  # Just in case no thumbnail has been downloaded
+                    for thumbnail in thumbnailssubdct:
+                        if "filepath" in thumbnail:
+                            thumbnailloc = thumbnail["filepath"]
 
                     # Download the playlist
                     ydl.download(link)
                     collectiontitle = playlistsubdct['title']
+
+                    # Save to JSon file
+                    locdict = opts.pathdicts['locdict']
+                    jsonloc = locdict['home'] + playlistsubdct['id'] + '.json'
+                    with open(jsonloc, 'w') as outfile:
+                        json.dump(playlistsubdct, outfile, indent='\t')
 
                     if collectionmodel.findcollectionbyname(collectiontitle) == None:
                         print(bcolors.OKCYAN + "Collection doesn't exist. Creating...\n" + bcolors.ENDC)
@@ -61,8 +68,8 @@ def dl(link, collection_destination=None):
                                                                         playlistsubdct['modified_date'],
                                                                         playlistsubdct['playlist_count'],
                                                                         playlistsubdct['uploader_url'],
-                                                                        playlistsubdct['epoch'], "TODO: ADD",
-                                                                        "TODO: ADD")
+                                                                        playlistsubdct['epoch'], thumbnailloc,
+                                                                        jsonloc)
                         newcollectionid = collectionmodel.createvideocollectionentry(newcollection)
                         if newcollectionid is None:
                             raise Exception("Could not create video collection entry.")
@@ -94,8 +101,12 @@ def registervideo(dict, locdict, collection_destination=None):
     loc = locdict['home'] + dict['id'] + '.' + dict['ext']
 
     # TODO: Generate
-    thumbloc = loc
-    jsonloc = loc
+    thumbloc = locdict['home']
+    jsonloc = locdict['home'] + dict['id'] + '.json'
+
+    # Save to JSon file
+    with open(jsonloc, 'w') as outfile:
+        json.dump(dict, outfile, indent='\t')
 
     # Create video object
     videoobject = videomodel.video(0, dict['id'], dict['title'], dict['description'],
