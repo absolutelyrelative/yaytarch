@@ -4,29 +4,43 @@ from db import get_db
 from tools.outputformat import bcolors
 
 
-# """ CREATE TABLE video (
-#    id INTEGER PRIMARY KEY AUTOINCREMENT,
-#    shorturl TEXT UNIQUE NOT NULL,
-#    title TEXT DEFAULT "",
-#    width INT DEFAULT 320,
-#    height INT DEFAULT 240,
-#    loc TEXT UNIQUE NOT NULL,
-#    descr TEXT DEFAULT "",
-#    resolution TEXT DEFAULT "",
-#    downloaded BOOLEAN DEFAULT 0
-# ); """
-
 class video:
-    def __init__(self, id, shorturl, title, width, height, loc, descr, resolution, downloaded):
+
+    # Consider using **kwargs, not a very pretty solution :(
+    def __init__(self, id, shorturl, title, description, uploader_url, view_count, webpage_url, like_count,
+                 availability, duration_string, ext, width, height, upload_date, channel, epoch, thumbnail,
+                 jsonloc, loc):
         self.id = id
         self.shorturl = shorturl
         self.title = title
+        self.description = description
+        self.uploader_url = uploader_url
+        self.view_count = view_count
+        self.webpage_url = webpage_url
+        self.like_count = like_count
+        self.availability = availability
+        self.duration_string = duration_string
+        self.ext = ext
         self.width = width
         self.height = height
+        self.upload_date = upload_date
+        self.channel = channel
+        self.epoch = epoch
+        # Custom fields:
+        self.thumbnail = thumbnail
+        self.jsonloc = jsonloc
         self.loc = loc
-        self.descr = descr
-        self.resolution = resolution
-        self.downloaded = downloaded
+
+
+# Because the amount of arguments is large, I'm using a helper function to get the result into a neat object.
+def parseresultintoobject(result):
+    videoobject = video(result['id'], result['shorturl'], result['title'], result['description'],
+                        result['uploader_url'], result['view_count'], result['webpage_url'], result['like_count'],
+                        result['availability'], result['duration_string'], result['ext'], result['width'],
+                        result['height'], result['upload_date'], result['channel'], result['epoch'],
+                        result['thumbnail'], result['jsonloc'], result['loc'])
+
+    return videoobject
 
 
 # Fetches video object from the database. Returns a video object if the operation is carried out succesfully,
@@ -41,11 +55,10 @@ def getvideobyid(videoid):
         print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
         print("{}".format(db_error))
         return None
-    videoobject = video(result['id'], result['shorturl'], result['title'], result['width'], result['height'],
-                        result['loc'],
-                        result['descr'], result['resolution'], result['downloaded'])
-
-    return videoobject
+    if result is not None:
+        videoobject = parseresultintoobject(result)
+        return videoobject
+    return None
 
 
 # TODO: Insert video info update logic
@@ -58,9 +71,10 @@ def createvideoentry(video):
 
     try:
         cursor.execute(
-            "INSERT OR IGNORE INTO video (shorturl, loc, downloaded, title, width, height, descr, resolution) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            (video.shorturl, video.loc, video.downloaded, video.title, video.width, video.height, video.descr,
-             video.resolution),
+            "INSERT OR IGNORE INTO video (shorturl, title, description, uploader_url, view_count, webpage_url, like_count, availability, duration_string, ext, width, height, upload_date, channel, epoch, thumbnail,jsonloc, loc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (video.shorturl, video.title, video.description, video.uploader_url, video.view_count, video.webpage_url,
+             video.like_count, video.availability, video.duration_string, video.ext, video.width, video.height,
+             video.upload_date, video.channel, video.epoch, video.thumbnail, video.jsonloc, video.loc),
         )
         db.commit()
     except db.IntegrityError as db_error:  # This should only be called only if shorturl already exists.
@@ -137,8 +151,6 @@ def getvideobyshorturl(shorturl):
         print("{}".format(db_error))
         return None
     if result is not None:
-        videoobject = video(result['id'], result['shorturl'], result['title'], result['width'], result['height'],
-                            result['loc'],
-                            result['descr'], result['resolution'], result['downloaded'])
+        videoobject = parseresultintoobject(result)
         return videoobject
     return None

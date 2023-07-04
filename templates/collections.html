@@ -3,7 +3,7 @@
 {% block content %}
     <div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a>
         <button class="buttonadd" onclick="openForm('add')">+</button>
-        <button class="buttonrefresh" onclick="openForm()">↻</button> <!-- TODO: Figure out how to POST on click -->
+        <form method="POST"><input type="submit" class="buttonrefresh" name="buttonrefresh" value="↻" ></form>
         <button class="buttonremove" onclick="openForm('remove')">─</button><br></div>
 {% for collection in collections %}
 <div class="responsive">
@@ -11,7 +11,7 @@
     <a href="{{ url_for('collections.viewcollection', collectionid=collection.id) }}">
       <img src="{{ url_for('static', filename='imagenotfound.png') }}" width="600" height="400">
     </a>
-    <div class="desc"><b>{{ collection.vcname }}</b><br> short url: <br><small>{{ collection.shorturl }}</small></div>
+    <div class="desc"><b>{{ collection.title }}</b><br> short url: <br><small>{{ collection.shorturl }}</small></div>
   </div>
 </div>
   {% endfor %}

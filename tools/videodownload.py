@@ -13,7 +13,7 @@ import json
 # respective collections
 # 'title': 'recipes', 'playlist_count': 8, '_type': 'playlist', 'entries': [{'id':
 # 'J305fi3nZ68', 'title':...}] '_type' will be 'video' for single videos
-def dl(link, collection_destination = None):
+def dl(link, collection_destination=None):
     db = get_db()
     opts = DlOptions
 
@@ -45,10 +45,32 @@ def dl(link, collection_destination = None):
             case 'playlist':  # playlist
                 try:
                     # Cycle through keys
-                    subdct = {key: dictdump[key] for key in DlArguments.playlistkeys}
+                    playlistsubdct = {key: dictdump[key] for key in DlArguments.playlistkeys}
 
+                    # Download the playlist
+                    ydl.download(link)
+                    collectiontitle = playlistsubdct['title']
+
+                    if collectionmodel.findcollectionbyname(collectiontitle) == None:
+                        print(bcolors.OKCYAN + "Collection doesn't exist. Creating...\n" + bcolors.ENDC)
+                        # Wow I really wish I used **Kwargs now
+                        # TODO: Add json and thumb loc
+                        newcollection = collectionmodel.videocollection(0, playlistsubdct['id'],
+                                                                        playlistsubdct['title'],
+                                                                        playlistsubdct['availability'],
+                                                                        playlistsubdct['modified_date'],
+                                                                        playlistsubdct['playlist_count'],
+                                                                        playlistsubdct['uploader_url'],
+                                                                        playlistsubdct['epoch'], "TODO: ADD",
+                                                                        "TODO: ADD")
+                        newcollectionid = collectionmodel.createvideocollectionentry(newcollection)
+                        if newcollectionid is None:
+                            raise Exception("Could not create video collection entry.")
+                    else:
+                        print(bcolors.OKCYAN + "Collection already exists. Appending videos to it...\n" + bcolors.ENDC)
+                    # Try to register each video individually
                     # Because of course the video entries in the playlist info don't share the same keys.
-                    for entry in subdct['entries']:
+                    for entry in playlistsubdct['entries']:
                         # Redownload information
                         info = ydl.extract_info(entry['id'], download=False)
                         dictdump = ydl.sanitize_info(info)
@@ -56,22 +78,10 @@ def dl(link, collection_destination = None):
                         # Save to JSon
                         infojson = json.dumps(subdct, indent='\t')
 
+                        registervideo(subdct, opts.pathdicts['locdict'], collectiontitle)
+
                     # Save to JSon
                     infojson = json.dumps(subdct, indent='\t')
-
-                    # Download the playlist
-                    ydl.download(link)
-                    collectiontitle = subdct['title']
-
-                    if collectionmodel.findcollectionbyname(collectiontitle) == None:
-                        print(bcolors.OKCYAN + "Collection doesn't exist. Creating...\n" + bcolors.ENDC)
-                        newcollection = collectionmodel.videocollection(0, collectiontitle, subdct['id'])
-                        collectionmodel.createvideocollectionentry(newcollection)
-                    else:
-                        print(bcolors.OKCYAN + "Collection already exists. Appending video to it...\n" + bcolors.ENDC)
-                    # Try to register each video individually
-                    for entry in subdct['entries']:
-                        registervideo(entry, opts.pathdicts['locdict'], collectiontitle)
                 except KeyError as keyerror:
                     print(bcolors.WARNING + "Problem adding video." + bcolors.ENDC)
                     print("{}".format(keyerror))
@@ -83,15 +93,25 @@ def dl(link, collection_destination = None):
 def registervideo(dict, locdict, collection_destination=None):
     loc = locdict['home'] + dict['id'] + '.' + dict['ext']
 
+    # TODO: Generate
+    thumbloc = loc
+    jsonloc = loc
+
     # Create video object
-    videoobject = videomodel.video(0, dict['id'], dict['title'], dict['width'], dict['height'], loc,
-                                   dict['description'], dict['resolution'], 1)
+    videoobject = videomodel.video(0, dict['id'], dict['title'], dict['description'],
+                                   dict['uploader_url'], dict['view_count'], dict['webpage_url'], dict['like_count'],
+                                   dict['availability'], dict['duration_string'], dict['ext'], dict['width'],
+                                   dict['height'], dict['upload_date'], dict['channel'], dict['epoch'],
+                                   thumbloc, jsonloc, loc)
+
     videoobjecttoupdate = videomodel.getvideobyshorturl(dict['id'])  # Check if video object already exists
     if videoobjecttoupdate is None:  # If video object is new, create it
-        print("Doesn't exist")
+        print("Creating video entry.")
         newvideoid = videomodel.createvideoentry(videoobject)
+        if newvideoid is None:
+            raise Exception("newvideoid returned None when it was already assured that it wouldn't.")
     else:  # If it's not new, update it
-        print("Exists")  # TODO: Insert update logic function call here
+        print("Video entry already exists.")  # TODO: Insert update logic function call here
         newvideoid = videoobjecttoupdate.id
 
     # Add the new video to collections

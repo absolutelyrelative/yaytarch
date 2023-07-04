@@ -4,18 +4,20 @@ from db import get_db
 from tools.outputformat import bcolors
 
 
-# CREATE TABLE videocollection (
-#    id INTEGER PRIMARY KEY AUTOINCREMENT,
-#    vcname TEXT UNIQUE NOT NULL,
-#    shorturl TEXT DEFAULT ""
-#    --Collections are treated locally to nullify same video redownload, therefore shorturl can be null
-# );
-
 class videocollection:
-    def __init__(self, id, vcname, shorturl):
+    def __init__(self, id, shorturl, title, availability, modified_date, playlist_count, uploader_url, epoch,
+                 thumbnail, jsonloc):
         self.id = id
-        self.vcname = vcname
         self.shorturl = shorturl
+        self.title = title
+        self.availability = availability
+        self.modified_date = modified_date
+        self.playlist_count = playlist_count
+        self.uploader_url = uploader_url
+        self.epoch = epoch
+
+        self.thumbnail = thumbnail
+        self.jsonloc = jsonloc
 
 
 # Fetches videocollection object from the database. Returns a videocollection object if the operation is carried out
@@ -30,7 +32,9 @@ def getvideocollectionbyid(videocollectionid):
         print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
         print("{}".format(db_error))
         return None
-    videocollectionobject = videocollection(result['id'], result['vcname'], result['shorturl'])
+    videocollectionobject = videocollection(result['id'], result['shorturl'], result['title'], result['availability'],
+                                            result['modified_date'], result['playlist_count'], result['uploader_url'],
+                                            result['epoch'], result['thumbnail'], result['jsonloc'])
 
     return videocollectionobject
 
@@ -38,7 +42,7 @@ def getvideocollectionbyid(videocollectionid):
 def findcollectionbyname(name):
     db = get_db()
     try:
-        result = db.execute("SELECT * FROM videocollection WHERE videocollection.vcname = '" + name + "'"
+        result = db.execute("SELECT * FROM videocollection WHERE videocollection.title = '" + name + "'"
                             ).fetchone()
     except db.Error as db_error:
         print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
@@ -46,7 +50,11 @@ def findcollectionbyname(name):
         return None
     # print(result['iddsftfyuihklkòlàçdfsxzazzzzzzzzzzzzzzzzzzzzz cazzo porco diooooooooooooooo do pioruna!!! curva mac iunih ouyvytf'])
     if result is not None:
-        videocollectionobject = videocollection(result['id'], result['vcname'], result['shorturl'])
+        videocollectionobject = videocollection(result['id'], result['shorturl'], result['title'],
+                                                result['availability'],
+                                                result['modified_date'], result['playlist_count'],
+                                                result['uploader_url'],
+                                                result['epoch'], result['thumbnail'], result['jsonloc'])
         return videocollectionobject
     else:
         return None
@@ -60,8 +68,10 @@ def createvideocollectionentry(videocollection):
 
     try:
         cursor.execute(
-            "INSERT OR IGNORE INTO videocollection (vcname, shorturl) VALUES (?, ?)",
-            (videocollection.vcname, videocollection.shorturl),
+            "INSERT OR IGNORE INTO videocollection (shorturl, title, availability, modified_date, playlist_count, uploader_url, epoch, thumbnail, jsonloc) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+            (videocollection.shorturl, videocollection.title, videocollection.availability,
+             videocollection.modified_date, videocollection.playlist_count, videocollection.uploader_url,
+             videocollection.epoch, videocollection.thumbnail, videocollection.jsonloc),
         )
         db.commit()
     except db.IntegrityError as db_error:  # This should only be called only if shorturl already exists.
