@@ -3,7 +3,7 @@
 {% block content %}
     <div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a>
         <button class="buttonadd" onclick="openForm('add')">+</button>
-        <form method="POST"><input type="submit" class="buttonrefresh" name="buttonrefresh" value="↻" ></form>
+        <div class="curseddiv"><form method="POST"><input type="submit" class="buttonrefresh" name="buttonrefresh" value="↻" ></form></div>
         <button class="buttonremove" onclick="openForm('remove')">─</button><br></div>
 {% for collection in collections %}
 <div class="responsive">

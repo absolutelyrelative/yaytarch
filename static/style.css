@@ -222,11 +222,14 @@ div.gallery {
 }
 
 .buttonrefresh{
-    width: 23px;
-    height: 23px;
     font-weight: bold;
     color: black;
     background-color: #FFBD44;
-    float: right;
     border-radius: 50%;
+}
+
+.curseddiv{
+    width: 23px;
+    height: 23px;
+    float: right;
 }

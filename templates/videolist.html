@@ -9,7 +9,7 @@
 <div class="responsive">
   <div class="gallery">
     <a href="{{ url_for('videos.viewvideo', videoid=video.id) }}">
-      <img src="{{ url_for('videos.load_picture', videoid=video.id) }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='imagenotfound.png') }}'" alt="" >
+      <img src="{{ url_for('videos.load_picture', videoid=video.id) }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='imagenotfound.png') }}'" alt="" width=200 height=400>
     </a>
     <div class="desc"><b> {{ video['title'] }} </b></div>
   </div>
