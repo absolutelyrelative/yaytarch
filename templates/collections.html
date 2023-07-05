@@ -9,7 +9,7 @@
 <div class="responsive">
   <div class="gallery">
     <a href="{{ url_for('collections.viewcollection', collectionid=collection.id) }}">
-      <img src="{{ url_for('collections.load_picture', collectionid=collection.id) }}" alt="image not found" width="600" height="400">
+      <img src="{{ url_for('collections.load_picture', collectionid=collection.id) }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='imagenotfound.png') }}'" alt="" width="600" height="400">
     </a>
     <div class="desc"><b>{{ collection.title }}</b><br> short url: <br><small>{{ collection.shorturl }}</small></div>
   </div>

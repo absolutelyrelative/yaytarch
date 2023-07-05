@@ -51,15 +51,10 @@ def load_video(videoid):
 @bp.route("/video/source/thumb/<int:videoid>")
 def load_picture(videoid):
     video = videomodel.getvideobyid(videoid)
+    dirname = os.path.dirname(video.thumbnail)
+    filename = os.path.basename(video.thumbnail)
 
-    videolocation = video.loc
-    videoshorturl = video.shorturl
-
-    # TODO: Check if the file even exists, and cycle through formats. This is just to test.
-    imagename = videoshorturl + ".webp"
-    dirname = os.path.dirname(videolocation)
-
-    return send_from_directory(dirname, imagename)
+    return send_from_directory(dirname, filename)
 
 
 @bp.cli.command("dl")

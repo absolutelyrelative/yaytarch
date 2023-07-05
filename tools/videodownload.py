@@ -100,8 +100,8 @@ def dl(link, collection_destination=None):
 def registervideo(dict, locdict, collection_destination=None):
     loc = locdict['home'] + dict['id'] + '.' + dict['ext']
 
-    # TODO: Generate
-    thumbloc = locdict['home']
+    # TODO: Generate a better one for pictures. Playlists already have file location saved in json, videos don't? :(
+    thumbloc = locdict['home'] + dict['id'] + '.webp'
     jsonloc = locdict['home'] + dict['id'] + '.json'
 
     # Save to JSon file
