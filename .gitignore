@@ -21,4 +21,5 @@ identifier.sqlite
 
 videos/
 references/
-pycharmrunconfigs/.run/dlpl.run.xml
+pycharmrunconfigs/.run/
+codereferences/

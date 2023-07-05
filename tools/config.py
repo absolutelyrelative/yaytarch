@@ -72,7 +72,13 @@ class DlOptions:
     loggerlist = [DlLogger().downloading, DlLogger().finished, DlLogger().error]
 
     ytdlp_options = {'paths': pathdicts['locdict'], 'outtmpl': pathdicts['outputtemplatedict'], 'format': 'mp4',
-                     'writethumbnail': True, 'logger': DlLogger(), 'progress_hooks': loggerlist}
+                     'writethumbnail': True, 'logger': DlLogger(), 'progress_hooks': loggerlist,
+                     # Post-processing to force thumbnail conversion to jpg. Hacky but only playlists give file output name for thumbnails.
+                     'postprocessors': [{
+                         'key': 'FFmpegThumbnailsConvertor',
+                         'format': 'jpg',
+                     }]
+                     }
 
 
 class DlArguments:
