@@ -30,7 +30,7 @@
           </video>
            <div id="textbox">
                <p class="alignleft">Uploaded by <a href="{{ video['uploader_url'] }}">{{ video['channel'] }}</a> on {{ video['upload_date'] }}</p>
-          <p class="aligncenter"></p>
+          <p class="aligncenter">Last refreshed: {{ video['epoch'] }}</p>
           <p class="alignright">{{ video['view_count'] }} 👁 {{ video['like_count'] }}👍</p>
         </div>
           <p> {{ video.description }} </p></center>

@@ -1,12 +1,22 @@
-import os
+import json
+
 from yt_dlp import YoutubeDL
 
-from model import videocollectionrelmodel
 from db import get_db
 from model import collectionmodel
 from model import videomodel
 from tools.config import *
-import json
+
+
+# Helper function to begin the download process by only specifying id. Useful for refreshing videos on the webpage.
+def dlbyid(videoid: int):
+    videoobjecttoupdate = videomodel.getvideobyid(videoid)
+    if videoobjecttoupdate is None:
+        print(
+            bcolors.FAIL + "Couldn't find video by videoid. Please report this bug, it should never happen." + bcolors.ENDC)
+    else:
+        print(bcolors.OKCYAN + "Updating video " + bcolors.BOLD + videoobjecttoupdate.title + bcolors.ENDC)
+        dl(videoobjecttoupdate.shorturl)
 
 
 # Gets video or playlist by link, automatically generates collection for playlists, and adds videos to
@@ -99,7 +109,7 @@ def dl(link, collection_destination=None):
 def registervideo(dict, locdict, collection_destination=None):
     loc = locdict['home'] + dict['id'] + '.' + dict['ext']
 
-    thumbloc = locdict['home'] + dict['id'] + '.jpg' # jpg enforced by postprocessor
+    thumbloc = locdict['home'] + dict['id'] + '.jpg'  # jpg enforced by postprocessor
     jsonloc = locdict['home'] + dict['id'] + '.json'
 
     # Save to JSon file
@@ -113,6 +123,7 @@ def registervideo(dict, locdict, collection_destination=None):
                                    dict['height'], dict['upload_date'], dict['channel'], dict['epoch'],
                                    thumbloc, jsonloc, loc)
 
+    # Remember, dict['id'] is our video['shorturl']
     videoobjecttoupdate = videomodel.getvideobyshorturl(dict['id'])  # Check if video object already exists
     if videoobjecttoupdate is None:  # If video object is new, create it
         print("Creating video entry.")
@@ -120,7 +131,7 @@ def registervideo(dict, locdict, collection_destination=None):
         if newvideoid is None:
             raise Exception("newvideoid returned None when it was already assured that it wouldn't.")
     else:  # If it's not new, update it
-        print(bcolors.OKCYAN + "Video entry already exists. Updating" + bcolors.ENDC, end=': ')
+        print(bcolors.OKCYAN + "Video entry already exists. Updating " + bcolors.BOLD + videoobjecttoupdate.title + bcolors.ENDC, end=': ')
         videomodel.updatevideoentry(videoobjecttoupdate, videoobject)
         newvideoid = videoobjecttoupdate.id
 
