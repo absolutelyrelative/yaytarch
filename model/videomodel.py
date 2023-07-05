@@ -154,3 +154,30 @@ def getvideobyshorturl(shorturl):
         videoobject = parseresultintoobject(result)
         return videoobject
     return None
+
+
+# This function takes in an old video object and a new video object and updates it in the database
+def updatevideoentry(oldvideo: video, newvideo: video):
+    db = get_db()
+
+    try:
+        result = db.execute(
+            "UPDATE video SET title = ?, description = ?, uploader_url = ?, view_count = ?, webpage_url = ?, like_count = ?, availability = ?, duration_string = ?, ext = ?, width = ?, height = ?, upload_date = ?, channel = ?, epoch = ?, thumbnail = ?, jsonloc = ?, loc = ? WHERE id == ?;",
+            (newvideo.title, newvideo.description, newvideo.uploader_url,
+             newvideo.view_count, newvideo.webpage_url, newvideo.like_count,
+             newvideo.availability, newvideo.duration_string, newvideo.ext,
+             newvideo.width, newvideo.height, newvideo.upload_date,
+             newvideo.channel, newvideo.epoch, newvideo.thumbnail,
+             newvideo.jsonloc, newvideo.loc, oldvideo.id), )
+
+        db.commit()
+    except db.Error as db_error:
+        print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
+        print("{}".format(db_error))
+        return None
+    except db.IntegrityError as db_error:
+        print("{}".format(db_error))
+    if result is not None:
+        print(bcolors.OKGREEN + "Video entry updated." + bcolors.ENDC)
+        return result
+    return None

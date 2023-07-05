@@ -61,7 +61,6 @@ def dl(link, collection_destination=None):
                     if collectionmodel.findcollectionbyname(collectiontitle) == None:
                         print(bcolors.OKCYAN + "Collection doesn't exist. Creating...\n" + bcolors.ENDC)
                         # Wow I really wish I used **Kwargs now
-                        # TODO: Add json and thumb loc
                         newcollection = collectionmodel.videocollection(0, playlistsubdct['id'],
                                                                         playlistsubdct['title'],
                                                                         playlistsubdct['availability'],
@@ -100,8 +99,7 @@ def dl(link, collection_destination=None):
 def registervideo(dict, locdict, collection_destination=None):
     loc = locdict['home'] + dict['id'] + '.' + dict['ext']
 
-    # TODO: Generate a better one for pictures. Playlists already have file location saved in json, videos don't? :(
-    thumbloc = locdict['home'] + dict['id'] + '.jpg'
+    thumbloc = locdict['home'] + dict['id'] + '.jpg' # jpg enforced by postprocessor
     jsonloc = locdict['home'] + dict['id'] + '.json'
 
     # Save to JSon file
@@ -122,7 +120,8 @@ def registervideo(dict, locdict, collection_destination=None):
         if newvideoid is None:
             raise Exception("newvideoid returned None when it was already assured that it wouldn't.")
     else:  # If it's not new, update it
-        print("Video entry already exists.")  # TODO: Insert update logic function call here
+        print(bcolors.OKCYAN + "Video entry already exists. Updating" + bcolors.ENDC, end=': ')
+        videomodel.updatevideoentry(videoobjecttoupdate, videoobject)
         newvideoid = videoobjecttoupdate.id
 
     # Add the new video to collections
