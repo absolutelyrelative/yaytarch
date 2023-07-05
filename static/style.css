@@ -94,16 +94,36 @@ div.gallery {
     max-width: 95%;
     /*width: 100%;
     height: auto;*/
-    width: 100%;
-    height: auto;
+    width: 400px;
+    height: 200px;
     max-height: 100%;
   }
   
   div.desc {
     padding: 2px;
     text-align: center;
-    height: 100px;
+    height: 75px;
   }
+
+    #textbox {display:flex; flex-flow:row wrap;}
+    .alignleft {
+        font-family: "Helvetica Neue", Helvetica, sans-serif;
+        font-size: 14px;
+        width: 33.33%;
+        text-align: left;
+    }
+    .aligncenter {
+        font-family: "Helvetica Neue", Helvetica, sans-serif;
+        font-size: 14px;
+        width: 33.33%;
+        text-align: center;
+    }
+    .alignright {
+        font-family: "Helvetica Neue", Helvetica, sans-serif;
+        font-size: 14px;
+        width: 33.33%;
+        text-align: right;
+    }
   
   * {
     box-sizing: border-box;
@@ -112,8 +132,8 @@ div.gallery {
   .responsive {
     padding: 10px 10px;
     float: left;
-    width: 300px;
-    height: 300px;
+    width: 25%;
+    height: 350px;
   }
   
   @media only screen and (max-width: 700px) {
