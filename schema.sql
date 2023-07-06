@@ -55,5 +55,3 @@ CREATE TABLE configuration (
 
 INSERT INTO videocollection(title)
 VALUES ("All videos");
-INSERT INTO configuration(downloadlocation, ytdlpargs, jsonargs)
-VALUES ("","","");

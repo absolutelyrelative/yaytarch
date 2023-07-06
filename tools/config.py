@@ -2,8 +2,9 @@
 # self.params['logger'].warning(message)
 # self.params['logger'].error(message)
 # self.params['logger'].debug(message)
-import os
+import os.path
 
+from model import configurationmodel
 from tools.outputformat import bcolors
 
 
@@ -58,27 +59,42 @@ class DlLogger:
 
 # Function to generate and return ytdlp options
 class DlOptions:
-    # Paths dictionary
-    pathdicts = {
-        'locdict': {
-            'home': os.getcwd() + '\\videos\\'
-        },
-        'outputtemplatedict': {
-            'default': "%(id)s.%(ext)s"
+    # Set up object
+    def __init__(self, folderloc):
+        # Fetch path from db
+        configuration = configurationmodel.fetchconfiguration()
+        downloadpath = configuration.downloadlocation
+
+        # Make sure path is set up correctly
+        if os.path.isdir(downloadpath):
+            downloadpath = os.path.join(downloadpath, "")
+
+        if folderloc is None:
+            folderloc = "yaylib\\"
+
+        # Paths dictionary
+        self.pathdicts = {
+            'locdict': {
+                'home': downloadpath + folderloc
+            },
+            'outputtemplatedict': {
+                'default': "%(id)s.%(ext)s"
+            }
         }
-    }
 
-    # List to tidy up logs
-    loggerlist = [DlLogger().downloading, DlLogger().finished, DlLogger().error]
+        # List to tidy up logs
+        self.loggerlist = [DlLogger().downloading, DlLogger().finished, DlLogger().error]
 
-    ytdlp_options = {'paths': pathdicts['locdict'], 'outtmpl': pathdicts['outputtemplatedict'], 'format': 'mp4',
-                     'writethumbnail': True, 'logger': DlLogger(), 'progress_hooks': loggerlist,
-                     # Post-processing to force thumbnail conversion to jpg. Hacky but only playlists give file output name for thumbnails.
-                     'postprocessors': [{
-                         'key': 'FFmpegThumbnailsConvertor',
-                         'format': 'jpg',
-                     }]
-                     }
+        self.ytdlp_options = {'paths': self.pathdicts['locdict'], 'outtmpl': self.pathdicts['outputtemplatedict'],
+                              'format': 'mp4',
+                              'writethumbnail': True, 'logger': DlLogger(), 'progress_hooks': self.loggerlist,
+                              # Post-processing to force thumbnail conversion to jpg. Hacky but only playlists
+                              # give file output name for thumbnails.
+                              'postprocessors': [{
+                                  'key': 'FFmpegThumbnailsConvertor',
+                                  'format': 'jpg',
+                              }]
+                              }
 
 
 class DlArguments:

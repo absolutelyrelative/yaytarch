@@ -23,9 +23,9 @@ def dlbyid(videoid: int):
 # respective collections
 def dl(link, collection_destination=None):
     db = get_db()
-    opts = DlOptions
+    opts = DlOptions(None)
 
-    with YoutubeDL(DlOptions.ytdlp_options) as ydl:
+    with YoutubeDL(opts.ytdlp_options) as ydl:
         print(bcolors.OKCYAN + "Downloading & parsing information...\n" + bcolors.ENDC)
         info = ydl.extract_info(link, download=False)
         dictdump = ydl.sanitize_info(info)
@@ -131,7 +131,9 @@ def registervideo(dict, locdict, collection_destination=None):
         if newvideoid is None:
             raise Exception("newvideoid returned None when it was already assured that it wouldn't.")
     else:  # If it's not new, update it
-        print(bcolors.OKCYAN + "Video entry already exists. Updating " + bcolors.BOLD + videoobjecttoupdate.title + bcolors.ENDC, end=': ')
+        print(
+            bcolors.OKCYAN + "Video entry already exists. Updating " + bcolors.BOLD + videoobjecttoupdate.title + bcolors.ENDC,
+            end=': ')
         videomodel.updatevideoentry(videoobjecttoupdate, videoobject)
         newvideoid = videoobjecttoupdate.id
 

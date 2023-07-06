@@ -3,6 +3,8 @@ import sqlite3
 import click
 from flask import current_app, g
 
+from model import configurationmodel
+
 
 def get_db():
     if 'db' not in g:
@@ -22,16 +24,22 @@ def close_db(e=None):
         db.close()
 
 
-def init_db():
+def init_db(location):
     db = get_db()
 
+    # Run setup queries
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
 
+    # Save download location setting
+    configuration = configurationmodel.configuration(location, "", "")
+    configurationmodel.initialconfiguration(configuration)
+
 
 @click.command('init-db')
-def init_db_command():
-    init_db()
+@click.argument("downloadlocation")
+def init_db_command(downloadlocation):
+    init_db(downloadlocation)
     click.echo('Initialised db.')
 
 
