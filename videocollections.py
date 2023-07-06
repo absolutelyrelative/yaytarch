@@ -26,7 +26,9 @@ def index():
             # No collection with the name has been found
             if collectionmodel.findcollectionbyname(collectionname) is None:
                 # New collection object
-                newcollection = collectionmodel.videocollection(0, collectionname, collectionurl)
+                # TODO: Test if after creating this local collection updates it well
+                newcollection = collectionmodel.videocollection(0, collectionurl, collectionname, "Local", "",
+                                                                "", "", "", "", "")
 
                 if collectionmodel.createvideocollectionentry(newcollection) is not None:  # Collection created
                     print(bcolors.OKGREEN + "Local collection created." + bcolors.ENDC)
@@ -68,13 +70,21 @@ def index():
 @bp.route('/collection/<int:collectionid>', methods=['GET', 'POST'])
 def viewcollection(collectionid):
     if request.method == 'POST':
-        try:
-            collectionname = collectionmodel.getvideocollectionbyid(collectionid).vcname
-        except:
-            print("Collection not found")  # Temporary solution
+
+        # Request type: add video in collection
         if 'videourl' in request.form.keys():
+            try:
+                collectionname = collectionmodel.getvideocollectionbyid(collectionid).title
+            except:
+                print("Collection not found")  # Temporary solution
             videourl = request.form['videourl']
             videodownload.dl(videourl, collectionname)
+
+        # Request type: refresh collection
+        if 'buttonrefresh' in request.form.keys():
+            videodownload.dlplaylistbyid(collectionid)
+
+
 
     videos = videocollectionmembershipmodel.getvideocollectionmembershipbyid(collectionid, type="COLLECTION")
     return render_template('videolist.html', videos=videos)

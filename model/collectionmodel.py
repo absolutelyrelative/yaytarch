@@ -59,6 +59,25 @@ def findcollectionbyname(name):
     else:
         return None
 
+def findcollectionbyshorturl(shorturl: str):
+    db = get_db()
+    try:
+        result = db.execute("SELECT * FROM videocollection WHERE videocollection.shorturl = '" + shorturl + "'"
+                            ).fetchone()
+    except db.Error as db_error:
+        print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
+        print("{}".format(db_error))
+        return None
+    if result is not None:
+        videocollectionobject = videocollection(result['id'], result['shorturl'], result['title'],
+                                                result['availability'],
+                                                result['modified_date'], result['playlist_count'],
+                                                result['uploader_url'],
+                                                result['epoch'], result['thumbnail'], result['jsonloc'])
+        return videocollectionobject
+    else:
+        return None
+
 
 # TODO: Insert videocollection info update logic Inserts videocollection objects into the database. Accepts
 #  videocollection object as argument, returns videocollection id if operation is carried out succesfully, None if not.
@@ -123,3 +142,27 @@ def removecollection(collectionid):
         print("{}".format(db_error))
         return None
     return "Collection has been deleted."
+
+
+# This function takes in an old collection object and a new collection object and updates it in the database
+def updatecollectionentry(oldcollection: videocollection, newcollection: videocollection):
+    db = get_db()
+
+    try:
+        result = db.execute(
+            "UPDATE videocollection SET shorturl = ?, title = ?, availability = ?, modified_date = ?, playlist_count = ?, uploader_url = ?, epoch = ?, thumbnail = ?, jsonloc = ? WHERE id == ?;",
+            (newcollection.shorturl, newcollection.title, newcollection.availability,
+             newcollection.modified_date, newcollection.playlist_count, newcollection.uploader_url,
+             newcollection.epoch, newcollection.thumbnail, newcollection.jsonloc, oldcollection.id), )
+
+        db.commit()
+    except db.Error as db_error:
+        print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
+        print("{}".format(db_error))
+        return None
+    except db.IntegrityError as db_error:
+        print("{}".format(db_error))
+    if result is not None:
+        print(bcolors.OKGREEN + "Collection entry updated." + bcolors.ENDC)
+        return result
+    return None

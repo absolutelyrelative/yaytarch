@@ -18,6 +18,23 @@ def dlbyid(videoid: int):
         print(bcolors.OKCYAN + "Updating video " + bcolors.BOLD + videoobjecttoupdate.title + bcolors.ENDC)
         dl(videoobjecttoupdate.shorturl)
 
+# Helper function to begin the download process by only specifying id. Useful for refreshing collections on the webpage.
+def dlplaylistbyid(collectionid: int):
+    collectionobjecttoupdate = collectionmodel.getvideocollectionbyid(collectionid)
+    if collectionobjecttoupdate is None:
+        print(
+            bcolors.FAIL + "Couldn't find collection by collectionid. Please report this bug, it should never happen." + bcolors.ENDC)
+    else:
+        print(bcolors.OKCYAN + "Updating collection " + bcolors.BOLD + collectionobjecttoupdate.title + bcolors.ENDC)
+
+        # Checking if collection is local
+        if collectionobjecttoupdate.shorturl != "":
+            dl(collectionobjecttoupdate.shorturl)
+        else:
+            print(
+                bcolors.FAIL + "Couldn't update collection, it is a local collection with an unspecified url." + bcolors.ENDC)
+
+
 
 # Gets video or playlist by link, automatically generates collection for playlists, and adds videos to
 # respective collections
@@ -68,7 +85,10 @@ def dl(link, collection_destination=None):
                     with open(jsonloc, 'w') as outfile:
                         json.dump(playlistsubdct, outfile, indent='\t')
 
-                    if collectionmodel.findcollectionbyname(collectiontitle) == None:
+                    # Uh, why EXACTLY was I checking by title and not by shorturl?
+                    # TODO: Test change
+                    oldcollection = collectionmodel.findcollectionbyshorturl(playlistsubdct['id'])
+                    if oldcollection is None:
                         print(bcolors.OKCYAN + "Collection doesn't exist. Creating...\n" + bcolors.ENDC)
                         # Wow I really wish I used **Kwargs now
                         newcollection = collectionmodel.videocollection(0, playlistsubdct['id'],
@@ -83,7 +103,17 @@ def dl(link, collection_destination=None):
                         if newcollectionid is None:
                             raise Exception("Could not create video collection entry.")
                     else:
-                        print(bcolors.OKCYAN + "Collection already exists. Appending videos to it...\n" + bcolors.ENDC)
+                        print(bcolors.OKCYAN + "Collection already exists. Updating videos...\n" + bcolors.ENDC)
+                        # TODO: This is redundant, merge with the one above
+                        newcollection = collectionmodel.videocollection(0, playlistsubdct['id'],
+                                                                        playlistsubdct['title'],
+                                                                        playlistsubdct['availability'],
+                                                                        playlistsubdct['modified_date'],
+                                                                        playlistsubdct['playlist_count'],
+                                                                        playlistsubdct['uploader_url'],
+                                                                        playlistsubdct['epoch'], thumbnailloc,
+                                                                        jsonloc)
+                        collectionmodel.updatecollectionentry(oldcollection, newcollection) # TODO: Test update function
                     # Try to register each video individually
                     # Because of course the video entries in the playlist info don't share the same keys.
                     for entry in playlistsubdct['entries']:
