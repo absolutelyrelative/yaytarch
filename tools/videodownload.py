@@ -137,10 +137,13 @@ def dl(link, collection_destination=None):
 
 # Creates Video entry and registers to specified collection
 def registervideo(dict, locdict, collection_destination=None):
-    loc = locdict['home'] + dict['id'] + '.' + dict['ext']
+    videofilename = dict['id'] + '.' + dict['ext']
+    thumbfilename = dict['id'] + '.jpg' # jpg enforced by postprocessor
+    jsonfilename = dict['id'] + '.json'
 
-    thumbloc = locdict['home'] + dict['id'] + '.jpg'  # jpg enforced by postprocessor
-    jsonloc = locdict['home'] + dict['id'] + '.json'
+    loc = os.path.join(locdict['home'], videofilename)
+    thumbloc = os.path.join(locdict['home'], thumbfilename)
+    jsonloc = os.path.join(locdict['home'], jsonfilename)
 
     # Save to JSon file
     with open(jsonloc, 'w') as outfile:

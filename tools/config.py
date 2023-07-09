@@ -70,12 +70,12 @@ class DlOptions:
             downloadpath = os.path.join(downloadpath, "")
 
         if folderloc is None:
-            folderloc = "yaylib\\"
+            folderloc = "yaylib"
 
         # Paths dictionary
         self.pathdicts = {
             'locdict': {
-                'home': downloadpath + folderloc
+                'home': os.path.join(downloadpath, folderloc)
             },
             'outputtemplatedict': {
                 'default': "%(id)s.%(ext)s"
