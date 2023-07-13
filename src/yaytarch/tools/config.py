@@ -4,8 +4,8 @@
 # self.params['logger'].debug(message)
 import os.path
 
-from model import configurationmodel
-from tools.outputformat import bcolors
+from ..model import configurationmodel
+from .outputformat import bcolors
 
 
 class DlLogger:

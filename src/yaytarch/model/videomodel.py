@@ -1,7 +1,7 @@
 # This module provides a class object for videos and helper methods to fetch and insert videos. Any data coherence
 # check should be done here.
-from db import get_db
-from tools.outputformat import bcolors
+from ..db import get_db
+from ..tools.outputformat import bcolors
 
 
 class video:

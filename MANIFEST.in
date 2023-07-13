@@ -1,4 +1,4 @@
-include yaytarch/schema.sql
-graft yaytarch/static
-graft yaytarch/templates
+include src/yaytarch/schema.sql
+graft src/yaytarch/static
+graft src/yaytarch/templates
 global-exclude *.pyc

@@ -2,10 +2,10 @@ import json
 
 from yt_dlp import YoutubeDL
 
-from db import get_db
-from model import collectionmodel
-from model import videomodel
-from tools.config import *
+from ..db import get_db
+from ..model import collectionmodel
+from ..model import videomodel
+from .config import *
 
 
 # Helper function to begin the download process by only specifying id. Useful for refreshing videos on the webpage.

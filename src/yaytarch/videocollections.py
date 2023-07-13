@@ -1,6 +1,6 @@
 import os.path
 
-from tools.outputformat import bcolors
+from .tools.outputformat import bcolors
 from .model import collectionmodel
 from .model import collectionmodel
 from .model import videocollectionrelmodel as videocollectionmembershipmodel
