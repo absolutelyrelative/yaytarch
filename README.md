@@ -16,10 +16,10 @@ It is a yt-dlp frontend built with python & flask and it allows you to:
   ![yaytarch_collectionview](https://github.com/absolutelyrelative/yaytarch/blob/main/images/collection_view.png?raw=true)
 
 ## Video list view
-![yaytarch_videolistview](https://github.com/absolutelyrelative/yaytarch/blob/main/images/video_view.png?raw=true)
+![yaytarch_videolistview](https://github.com/absolutelyrelative/yaytarch/blob/main/images/videolist_view.png?raw=true)
 
 ## Video view
-![yaytarch_videoview](https://github.com/absolutelyrelative/yaytarch/blob/main/images/videolist_view.png?raw=true)
+![yaytarch_videoview](https://github.com/absolutelyrelative/yaytarch/blob/main/images/video_view.png?raw=true)
 
 
 Setting up & basic commands to come
