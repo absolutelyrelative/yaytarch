@@ -54,8 +54,18 @@ class DlLogger:
     #                        Progress hooks are guaranteed to be called at least once
     #                        (with status "finished") if the download is successful.
     def finished(self, *args):
-        print(bcolors.OKCYAN + "Finished" + bcolors.ENDC)
-
+        for arg in args:
+            if 'status' in arg:
+                status = arg['status']
+            if 'info_dict' in arg:
+                title = arg['info_dict']['title']
+            if '_default_template' in arg:
+                completion = arg['_default_template']
+            if 'filename' in arg:
+                filename = arg['filename']
+            print(bcolors.BOLD + bcolors.OKCYAN + status + bcolors.ENDC, end='')
+            print(bcolors.OKCYAN + ' downloading video ' + bcolors.BOLD + title + bcolors.ENDC, end=': ')
+            print(completion + ' saved to ' + filename)
 
 # Function to generate and return ytdlp options
 class DlOptions:
