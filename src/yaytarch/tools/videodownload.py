@@ -80,8 +80,10 @@ def dl(link, collection_destination=None):
                     collectiontitle = playlistsubdct['title']
 
                     # Save to JSon file
-                    locdict = opts.pathdicts['locdict']
-                    jsonloc = locdict['home'] + playlistsubdct['id'] + '.json'
+                    jsonfilename = playlistsubdct['id'] + '.json'
+                    jsonloc = os.path.join(opts.pathdicts['locdict']['home'], jsonfilename)
+
+
                     with open(jsonloc, 'w') as outfile:
                         json.dump(playlistsubdct, outfile, indent='\t')
 
