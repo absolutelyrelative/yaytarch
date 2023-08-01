@@ -54,6 +54,11 @@ class DlLogger:
     #                        Progress hooks are guaranteed to be called at least once
     #                        (with status "finished") if the download is successful.
     def finished(self, *args):
+        status = ''
+        title = ''
+        completion = ''
+        filename = ''
+        
         for arg in args:
             if 'status' in arg:
                 status = arg['status']
