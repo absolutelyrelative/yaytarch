@@ -13,13 +13,13 @@ It is a yt-dlp frontend built with python & flask and it allows you to:
 - (Soon) import local videos!
 
 ## Collections view
-  ![yaytarch_collectionview](https://github.com/absolutelyrelative/yaytarch/assets/59060818/b0cb6396-bfc0-4d6c-8932-5fbbaeab6e27)
+  ![yaytarch_collectionview](https://github.com/absolutelyrelative/yaytarch/blob/main/images/collection_view.png?raw=true)
 
 ## Video list view
-![yaytarch_videolistview](https://github.com/absolutelyrelative/yaytarch/assets/59060818/862349c8-3b00-4024-ac45-47df1e4422d8)
+![yaytarch_videolistview](https://github.com/absolutelyrelative/yaytarch/blob/main/images/video_view.png?raw=true)
 
 ## Video view
-![yaytarch_videoview](https://github.com/absolutelyrelative/yaytarch/assets/59060818/5be9c3a2-3722-4818-8901-021f092c5134)
+![yaytarch_videoview](https://github.com/absolutelyrelative/yaytarch/blob/main/images/videolist_view.png?raw=true)
 
 
 Setting up & basic commands to come
