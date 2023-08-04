@@ -58,8 +58,8 @@ class DlLogger:
         title = ''
         completion = ''
         filename = ''
-        
-        for arg in args: # Are there cases in which some of these are present but not all ?
+
+        for arg in args:  # Are there cases in which some of these are present but not all ?
             if 'status' in arg:
                 status = arg['status']
             if 'info_dict' in arg:
@@ -70,12 +70,14 @@ class DlLogger:
                 filename = arg['filename']
 
             # This is horrible, but windows console is not great to print.
-            print(bcolors.BOLD + bcolors.OKCYAN, end='')
-            print(status.encode("cp1252", errors="ignore"), end='')
-            print(bcolors.ENDC, end='')
+            if status != "downloading":  # TODO: Find a more elegant solution, windows console broke this
+                print(bcolors.BOLD + bcolors.OKCYAN, end='')
+                print(status.encode("cp1252", errors="ignore"), end='')
+                print(bcolors.ENDC, end='')
 
-            print(bcolors.OKCYAN + ' downloading video: ' + bcolors.BOLD, end='')
-            print(title.encode("cp1252", errors="ignore"))
+                print(bcolors.OKCYAN + ' downloading video: ' + bcolors.BOLD, end='')
+                print(title.encode("cp1252", errors="ignore"))
+
 
 # Function to generate and return ytdlp options
 class DlOptions:
