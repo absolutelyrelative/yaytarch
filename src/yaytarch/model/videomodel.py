@@ -42,6 +42,23 @@ def parseresultintoobject(result):
 
     return videoobject
 
+# Gets all videos in a list
+def getallvideos():
+    db = get_db()
+
+    try:
+        result = db.execute('SELECT * FROM video WHERE shorturl IS NOT NULL'
+                            ).fetchall()
+    except db.Error as db_error:
+        print(bcolors.WARNING + "Database error:" + bcolors.ENDC)
+        print("{}".format(db_error))
+        return None
+    if result is not None:
+        videolist = []
+        for entry in result:
+            videolist.append(parseresultintoobject(entry))
+        return videolist
+    return None
 
 # Fetches video object from the database. Returns a video object if the operation is carried out succesfully,
 # None if not.

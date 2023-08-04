@@ -26,7 +26,6 @@ def index():
             # No collection with the name has been found
             if collectionmodel.findcollectionbyname(collectionname) is None:
                 # New collection object
-                # TODO: Test if after creating this local collection updates it well
                 newcollection = collectionmodel.videocollection(0, collectionurl, collectionname, "Local", "",
                                                                 "", "", "", "", "")
 
@@ -61,6 +60,15 @@ def index():
                 else:
                     print(
                         bcolors.WARNING + "Could not delete collection. Check terminal for more information." + bcolors.ENDC)
+
+        # Note: a decision was made for this button to refresh all VIDEOS with a valid id, rather than playlists.
+        #       reason being that videos being moved between collections may not match the playlist shorturl
+        #       the collection is associated with, and thus wouldn't get refreshed. This is supposed to be a global
+        #       refresh button.
+        # Request type: update
+        if 'buttonrefresh' in request.form.keys():
+            videodownload.refreshallvideos()
+
 
     collections = collectionmodel.getallcollections()
     return render_template('collections.html', collections=collections)

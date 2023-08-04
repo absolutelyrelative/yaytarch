@@ -68,9 +68,14 @@ class DlLogger:
                 completion = arg['_default_template']
             if 'filename' in arg:
                 filename = arg['filename']
-            print(bcolors.BOLD + bcolors.OKCYAN + status + bcolors.ENDC, end='')
-            print(bcolors.OKCYAN + ' downloading video ' + bcolors.BOLD + title + bcolors.ENDC, end=': ')
-            print(completion + ' saved to ' + filename)
+
+            # This is horrible, but windows console is not great to print.
+            print(bcolors.BOLD + bcolors.OKCYAN, end='')
+            print(status.encode("cp1252", errors="ignore"), end='')
+            print(bcolors.ENDC, end='')
+
+            print(bcolors.OKCYAN + ' downloading video: ' + bcolors.BOLD, end='')
+            print(title.encode("cp1252", errors="ignore"))
 
 # Function to generate and return ytdlp options
 class DlOptions:

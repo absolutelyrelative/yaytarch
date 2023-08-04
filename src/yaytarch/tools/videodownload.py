@@ -12,10 +12,12 @@ from .config import *
 def dlbyid(videoid: int):
     videoobjecttoupdate = videomodel.getvideobyid(videoid)
     if videoobjecttoupdate is None:
-        print(
-            bcolors.FAIL + "Couldn't find video by videoid. Please report this bug, it should never happen." + bcolors.ENDC)
+        raise Exception(
+            bcolors.FAIL + "Couldn't find collection by videoid. Please report this bug, it should never happen." + bcolors.ENDC)
     else:
-        print(bcolors.OKCYAN + "Updating video " + bcolors.BOLD + videoobjecttoupdate.title + bcolors.ENDC)
+        print(bcolors.OKCYAN + "Updating video " + bcolors.BOLD)
+        print(videoobjecttoupdate.title.encode("cp1252", errors="ignore"))  # Thanks, windows.
+        print(bcolors.ENDC)
         dl(videoobjecttoupdate.shorturl)
 
 
@@ -23,7 +25,7 @@ def dlbyid(videoid: int):
 def dlplaylistbyid(collectionid: int):
     collectionobjecttoupdate = collectionmodel.getvideocollectionbyid(collectionid)
     if collectionobjecttoupdate is None:
-        print(
+        raise Exception(
             bcolors.FAIL + "Couldn't find collection by collectionid. Please report this bug, it should never happen." + bcolors.ENDC)
     else:
         print(bcolors.OKCYAN + "Updating collection " + bcolors.BOLD + collectionobjecttoupdate.title + bcolors.ENDC)
@@ -34,6 +36,14 @@ def dlplaylistbyid(collectionid: int):
         else:
             print(
                 bcolors.FAIL + "Couldn't update collection, it is a local collection with an unspecified url." + bcolors.ENDC)
+
+
+# Helper function to refresh all videos with a valid short url
+def refreshallvideos():
+    print(bcolors.OKCYAN + "Refreshing all videos with a valid short url...\n" + bcolors.ENDC)
+    videos = videomodel.getallvideos()
+    for video in videos:
+        dl(video.shorturl)
 
 
 # Gets video or playlist by link, automatically generates collection for playlists, and adds videos to
@@ -56,7 +66,7 @@ def dl(link, collection_destination=None):
                 parsevideoinfo(dictdump, collection_destination)
 
             # PROBLEM! ONLY this is called when playlists are found, it doesn't cycle through.
-            case 'playlist':  # playlist
+            case 'playlist':  # playlist AND channels
                 # Download the playlist
                 ydl.download(link)
 
@@ -78,8 +88,9 @@ def registervideo(video, collection_destination=None):
             raise Exception("newvideoid returned None when it was already assured that it wouldn't.")
     else:  # If it's not new, update it
         print(
-            bcolors.OKCYAN + "Video entry already exists. Updating " + bcolors.BOLD + videoobjecttoupdate.title + bcolors.ENDC,
-            end=': ')
+            bcolors.OKCYAN + "Video entry already exists. Updating " + bcolors.BOLD, end='')
+        print(videoobjecttoupdate.title.encode("cp1252", errors="ignore"), end='')
+        print(bcolors.ENDC, end=': ')
         videomodel.updatevideoentry(videoobjecttoupdate, video)
         newvideoid = videoobjecttoupdate.id
 
@@ -188,7 +199,7 @@ def registerplaylist(playlistsubdct, thumbnailloc, jsonloc):
     else:
         print(bcolors.OKCYAN + "Collection already exists. Updating videos...\n" + bcolors.ENDC)
         collectionmodel.updatecollectionentry(oldcollection,
-                                              newcollection)  # TODO: Test update function
+                                              newcollection)
 
         # try to register each video individually
         # because of course the video entries in the playlist info don't share the same keys.
