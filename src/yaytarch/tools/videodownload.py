@@ -1,5 +1,7 @@
 import json
+import contextlib
 
+import yt_dlp.utils
 from yt_dlp import YoutubeDL
 
 from ..db import get_db
@@ -53,7 +55,11 @@ def dl(link, collection_destination=None):
 
     with YoutubeDL(opts.ytdlp_options) as ydl:
         print(bcolors.OKCYAN + "Downloading & parsing information...\n" + bcolors.ENDC)
+        # with contextlib.suppress(Exception):  # Necessary to suppress ytdlp exceptions in a playlist
+        #try:
         info = ydl.extract_info(link, download=False)
+        #except yt_dlp.utils.DownloadError as dlerror:
+        #    pass
         dictdump = ydl.sanitize_info(info)
 
         print(bcolors.OKCYAN + "Downloading videos...\n" + bcolors.ENDC)
@@ -201,11 +207,13 @@ def registerplaylist(playlistsubdct, thumbnailloc, jsonloc):
         collectionmodel.updatecollectionentry(oldcollection,
                                               newcollection)
 
-        # try to register each video individually
-        # because of course the video entries in the playlist info don't share the same keys.
-        with YoutubeDL(opts.ytdlp_options) as ydl:
-            for entry in playlistsubdct['entries']:
-                # Redownload information
+    # try to register each video individually
+    # because of course the video entries in the playlist info don't share the same keys.
+    with YoutubeDL(opts.ytdlp_options) as ydl:
+        for entry in playlistsubdct['entries']:
+            # TODO: Find a better, more universal solution. This check on availability might only work on yt.
+            # Redownload information
+            if entry is not None and (entry['availability'] != 'public' or entry['availability'] != 'unlisted'):  # entry is none if video is blocked / private (?)
                 info = ydl.extract_info(entry['id'], download=False)
                 dictdump = ydl.sanitize_info(info)
 

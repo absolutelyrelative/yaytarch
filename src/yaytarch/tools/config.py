@@ -108,8 +108,9 @@ class DlOptions:
         self.loggerlist = [DlLogger().downloading, DlLogger().finished, DlLogger().error]
 
         self.ytdlp_options = {'paths': self.pathdicts['locdict'], 'outtmpl': self.pathdicts['outputtemplatedict'],
-                              'format': 'mp4',
-                              'writethumbnail': True, 'logger': DlLogger(), 'progress_hooks': self.loggerlist,
+                              'format': 'mp4', 'ignoreerrors': True,
+                              'writethumbnail': True, 'logger': DlLogger(),
+                              'progress_hooks': self.loggerlist,
                               # Post-processing to force thumbnail conversion to jpg. Hacky but only playlists
                               # give file output name for thumbnails.
                               'postprocessors': [{
