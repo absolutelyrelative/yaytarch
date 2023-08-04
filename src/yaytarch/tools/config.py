@@ -59,7 +59,7 @@ class DlLogger:
         completion = ''
         filename = ''
         
-        for arg in args:
+        for arg in args: # Are there cases in which some of these are present but not all ?
             if 'status' in arg:
                 status = arg['status']
             if 'info_dict' in arg:
