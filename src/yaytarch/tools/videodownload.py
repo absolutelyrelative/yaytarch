@@ -57,70 +57,12 @@ def dl(link, collection_destination=None):
 
             # PROBLEM! ONLY this is called when playlists are found, it doesn't cycle through.
             case 'playlist':  # playlist
-                try:
-                    # Cycle through keys
-                    playlistsubdct = {key: dictdump[key] for key in DlArguments.playlistkeys}
-                    thumbnailssubdct = dictdump['thumbnails']
+                # Download the playlist
+                ydl.download(link)
 
-                    # Extract downloaded thumbnail location
-                    thumbnailloc = ""  # Just in case no thumbnail has been downloaded
-                    for thumbnail in thumbnailssubdct:
-                        if "filepath" in thumbnail:
-                            thumbnailloc = thumbnail["filepath"]
+                # Process the playlist locally
+                parseplaylistinfo(dictdump)
 
-                    # Download the playlist
-                    ydl.download(link)
-                    collectiontitle = playlistsubdct['title']
-
-                    # Save to JSon file
-                    jsonfilename = playlistsubdct['id'] + '.json'
-                    jsonloc = os.path.join(opts.pathdicts['locdict']['home'], jsonfilename)
-
-                    with open(jsonloc, 'w') as outfile:
-                        json.dump(playlistsubdct, outfile, indent='\t')
-
-                    # Uh, why EXACTLY was I checking by title and not by shorturl?
-                    # TODO: Test change
-                    oldcollection = collectionmodel.findcollectionbyshorturl(playlistsubdct['id'])
-                    if oldcollection is None:
-                        print(bcolors.OKCYAN + "Collection doesn't exist. Creating...\n" + bcolors.ENDC)
-                        # Wow I really wish I used **Kwargs now
-                        newcollection = collectionmodel.videocollection(0, playlistsubdct['id'],
-                                                                        playlistsubdct['title'],
-                                                                        playlistsubdct['availability'],
-                                                                        playlistsubdct['modified_date'],
-                                                                        playlistsubdct['playlist_count'],
-                                                                        playlistsubdct['uploader_url'],
-                                                                        playlistsubdct['epoch'], thumbnailloc,
-                                                                        jsonloc)
-                        newcollectionid = collectionmodel.createvideocollectionentry(newcollection)
-                        if newcollectionid is None:
-                            raise Exception("Could not create video collection entry.")
-                    else:
-                        print(bcolors.OKCYAN + "Collection already exists. Updating videos...\n" + bcolors.ENDC)
-                        # TODO: This is redundant, merge with the one above
-                        newcollection = collectionmodel.videocollection(0, playlistsubdct['id'],
-                                                                        playlistsubdct['title'],
-                                                                        playlistsubdct['availability'],
-                                                                        playlistsubdct['modified_date'],
-                                                                        playlistsubdct['playlist_count'],
-                                                                        playlistsubdct['uploader_url'],
-                                                                        playlistsubdct['epoch'], thumbnailloc,
-                                                                        jsonloc)
-                        collectionmodel.updatecollectionentry(oldcollection,
-                                                              newcollection)  # TODO: Test update function
-                    # Try to register each video individually
-                    # Because of course the video entries in the playlist info don't share the same keys.
-                    for entry in playlistsubdct['entries']:
-                        # Redownload information
-                        info = ydl.extract_info(entry['id'], download=False)
-                        dictdump = ydl.sanitize_info(info)
-
-                        # Process the video locally
-                        parsevideoinfo(dictdump, collectiontitle)
-                except KeyError as keyerror:
-                    print(bcolors.WARNING + "Problem adding video." + bcolors.ENDC)
-                    print("{}".format(keyerror))
             case _:  # may be required for other platforms / channels
                 pass
 
@@ -191,3 +133,70 @@ def parsevideoinfo(dictdump, collection_destination=None):
     except BaseException as exception:
         print(bcolors.WARNING + "Problem parsing video information." + bcolors.ENDC)
         print("{}".format(exception))
+
+
+# Helper function to configure playlists for local use.
+
+def parseplaylistinfo(dictdump):
+    opts = DlOptions(None)
+
+    try:
+        # Cycle through keys
+        playlistsubdct = {key: dictdump[key] for key in DlArguments.playlistkeys}
+        thumbnailssubdct = dictdump['thumbnails']
+        # extract downloaded thumbnail location
+        thumbnailloc = ""  # Just in case no thumbnail has been downloaded
+        for thumbnail in thumbnailssubdct:
+            if "filepath" in thumbnail:
+                thumbnailloc = thumbnail["filepath"]
+
+        # save to JSon file
+        jsonfilename = playlistsubdct['id'] + '.json'
+        jsonloc = os.path.join(opts.pathdicts['locdict']['home'], jsonfilename)
+        with open(jsonloc, 'w') as outfile:
+            json.dump(playlistsubdct, outfile, indent='\t')
+
+        registerplaylist(playlistsubdct, thumbnailloc, jsonloc)
+    except KeyError as keyerror:
+        print(bcolors.WARNING + "Problem adding video." + bcolors.ENDC)
+        print("{}".format(keyerror))
+
+
+# Creates collection entry and registers to specified collection. Cycles and parses through each video of the playlist
+#   and registers it to the collection.
+
+def registerplaylist(playlistsubdct, thumbnailloc, jsonloc):
+    opts = DlOptions(None)
+
+    # create new collection object
+    newcollection = collectionmodel.videocollection(0, playlistsubdct['id'],
+                                                    playlistsubdct['title'],
+                                                    playlistsubdct['availability'],
+                                                    playlistsubdct['modified_date'],
+                                                    playlistsubdct['playlist_count'],
+                                                    playlistsubdct['uploader_url'],
+                                                    playlistsubdct['epoch'], thumbnailloc,
+                                                    jsonloc)
+
+    # Check if collection already exists
+    oldcollection = collectionmodel.findcollectionbyshorturl(playlistsubdct['id'])
+    if oldcollection is None:
+        print(bcolors.OKCYAN + "Collection doesn't exist. Creating...\n" + bcolors.ENDC)
+        newcollectionid = collectionmodel.createvideocollectionentry(newcollection)
+        if newcollectionid is None:
+            raise Exception("Could not create video collection entry.")
+    else:
+        print(bcolors.OKCYAN + "Collection already exists. Updating videos...\n" + bcolors.ENDC)
+        collectionmodel.updatecollectionentry(oldcollection,
+                                              newcollection)  # TODO: Test update function
+
+        # try to register each video individually
+        # because of course the video entries in the playlist info don't share the same keys.
+        with YoutubeDL(opts.ytdlp_options) as ydl:
+            for entry in playlistsubdct['entries']:
+                # Redownload information
+                info = ydl.extract_info(entry['id'], download=False)
+                dictdump = ydl.sanitize_info(info)
+
+                # Process the video locally
+                parsevideoinfo(dictdump, playlistsubdct['title'])
