@@ -19,7 +19,8 @@ class DlLogger:
         pass
 
     def error(self, *args):
-        pass
+        for entry in args:
+            print(bcolors.BOLD + bcolors.FAIL + entry + bcolors.ENDC)
 
     def downloading(self, *args):
         pass
@@ -61,7 +62,7 @@ class DlLogger:
             filename = dictionary['filename']
 
             print(bcolors.BOLD + bcolors.OKGREEN + "Finished downloading: ", end='')
-            print(completion + title + "at" + filename, sep='\t', end='')
+            print(completion + title + " at " + filename, sep='\t', end='')
             print(bcolors.ENDC)
 
 

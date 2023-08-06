@@ -54,7 +54,7 @@ def dl(link, collection_destination=None):
     opts = DlOptions(None)
 
     with YoutubeDL(opts.ytdlp_options) as ydl:
-        print(bcolors.OKCYAN + "Downloading & parsing information...\n" + bcolors.ENDC)
+        print(bcolors.OKCYAN + "Downloading & parsing information..." + bcolors.ENDC)
         # with contextlib.suppress(Exception):  # Necessary to suppress ytdlp exceptions in a playlist
         #try:
         info = ydl.extract_info(link, download=False)
@@ -62,25 +62,29 @@ def dl(link, collection_destination=None):
         #    pass
         dictdump = ydl.sanitize_info(info)
 
-        print(bcolors.OKCYAN + "Downloading videos...\n" + bcolors.ENDC)
+        print(bcolors.OKCYAN + "Downloading videos..." + bcolors.ENDC)
         # Get video type
-        match dictdump['_type']:
-            case 'video':  # single video
-                # Download the video
-                ydl.download(link)
-                # Process the video locally
-                parsevideoinfo(dictdump, collection_destination)
+        if dictdump is not None:
+            match dictdump['_type']:
+                case 'video':  # single video
+                    # Download the video
+                    ydl.download(link)
+                    # Process the video locally
+                    parsevideoinfo(dictdump, collection_destination)
 
-            # PROBLEM! ONLY this is called when playlists are found, it doesn't cycle through.
-            case 'playlist':  # playlist AND channels
-                # Download the playlist
-                ydl.download(link)
+                # PROBLEM! ONLY this is called when playlists are found, it doesn't cycle through.
+                case 'playlist':  # playlist AND channels
+                    # Download the playlist
+                    ydl.download(link)
 
-                # Process the playlist locally
-                parseplaylistinfo(dictdump)
+                    # Process the playlist locally
+                    parseplaylistinfo(dictdump)
 
-            case _:  # may be required for other platforms / channels
-                pass
+                case _:  # may be required for other platforms / channels
+                    pass
+        else:
+            # TODO: Add to database anyway and mark it as not downloaded.
+            print(bcolors.BOLD + bcolors.FAIL + "Could not download video, skipping..." + bcolors.ENDC)
 
 
 # Creates Video entry and registers to specified collection
