@@ -20,7 +20,8 @@ class DlLogger:
 
     def error(self, *args):
         for entry in args:
-            print(bcolors.BOLD + bcolors.FAIL + entry + bcolors.ENDC)
+            if isinstance(entry, str):
+                print(bcolors.BOLD + bcolors.FAIL + entry + bcolors.ENDC)
 
     def downloading(self, *args):
         pass
@@ -58,12 +59,17 @@ class DlLogger:
         if dictionary['status'] == 'finished':
             # set up strings for future encoding if windows terminal has issues again
             title = dictionary['info_dict']['title']
-            completion = dictionary['_default_template']
             filename = dictionary['filename']
+            percentage = dictionary['_percent_str']  # redundant but keeping it
+            # TODO: distinguish case in which it has already been downloaded. (Speed and time are marked as unknown)
+            totalbytes = dictionary['_total_bytes_str']
+            elapsed = dictionary['_elapsed_str']
+            speed = dictionary['_speed_str']
 
-            print(bcolors.BOLD + bcolors.OKGREEN + "Finished downloading: ", end='')
-            print(completion + title + " at " + filename, sep='\t', end='')
-            print(bcolors.ENDC)
+            print(bcolors.OKGREEN + "Finished downloading: ", end='')
+            print(bcolors.BOLD + title + " at " + filename + bcolors.ENDC, end='')
+            print(bcolors.OKGREEN + " (" + percentage + " of " + totalbytes + " in " + elapsed + " @ " + speed + ")" +
+                  bcolors.ENDC)
 
 
 # Function to generate and return ytdlp options

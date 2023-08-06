@@ -42,7 +42,7 @@ def dlplaylistbyid(collectionid: int):
 
 # Helper function to refresh all videos with a valid short url
 def refreshallvideos():
-    print(bcolors.OKCYAN + "Refreshing all videos with a valid short url...\n" + bcolors.ENDC)
+    print(bcolors.OKCYAN + "Refreshing all videos with a valid short url..." + bcolors.ENDC)
     videos = videomodel.getallvideos()
     for video in videos:
         dl(video.shorturl)
@@ -202,12 +202,12 @@ def registerplaylist(playlistsubdct, thumbnailloc, jsonloc):
     # Check if collection already exists
     oldcollection = collectionmodel.findcollectionbyshorturl(playlistsubdct['id'])
     if oldcollection is None:
-        print(bcolors.OKCYAN + "Collection doesn't exist. Creating...\n" + bcolors.ENDC)
+        print(bcolors.OKCYAN + "Collection doesn't exist. Creating..." + bcolors.ENDC)
         newcollectionid = collectionmodel.createvideocollectionentry(newcollection)
         if newcollectionid is None:
             raise Exception("Could not create video collection entry.")
     else:
-        print(bcolors.OKCYAN + "Collection already exists. Updating videos...\n" + bcolors.ENDC)
+        print(bcolors.OKCYAN + "Collection already exists. Updating videos..." + bcolors.ENDC)
         collectionmodel.updatecollectionentry(oldcollection,
                                               newcollection)
 
