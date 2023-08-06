@@ -53,30 +53,16 @@ class DlLogger:
     #
     #                        Progress hooks are guaranteed to be called at least once
     #                        (with status "finished") if the download is successful.
-    def finished(self, *args):
-        status = ''
-        title = ''
-        completion = ''
-        filename = ''
+    def finished(self, dictionary):
+        if dictionary['status'] == 'finished':
+            # set up strings for future encoding if windows terminal has issues again
+            title = dictionary['info_dict']['title']
+            completion = dictionary['_default_template']
+            filename = dictionary['filename']
 
-        for arg in args:  # Are there cases in which some of these are present but not all ?
-            if 'status' in arg:
-                status = arg['status']
-            if 'info_dict' in arg:
-                title = arg['info_dict']['title']
-            if '_default_template' in arg:
-                completion = arg['_default_template']
-            if 'filename' in arg:
-                filename = arg['filename']
-
-            # This is horrible, but windows console is not great to print.
-            if status != "downloading":  # TODO: Find a more elegant solution, windows console broke this
-                print(bcolors.BOLD + bcolors.OKCYAN, end='')
-                print(status.encode("cp1252", errors="ignore"), end='')
-                print(bcolors.ENDC, end='')
-
-                print(bcolors.OKCYAN + ' downloading video: ' + bcolors.BOLD, end='')
-                print(title.encode("cp1252", errors="ignore"))
+            print(bcolors.BOLD + bcolors.OKGREEN + "Finished downloading: ", end='')
+            print(completion + title + "at" + filename, sep='\t', end='')
+            print(bcolors.ENDC)
 
 
 # Function to generate and return ytdlp options

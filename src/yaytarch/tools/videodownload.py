@@ -18,7 +18,7 @@ def dlbyid(videoid: int):
             bcolors.FAIL + "Couldn't find collection by videoid. Please report this bug, it should never happen." + bcolors.ENDC)
     else:
         print(bcolors.OKCYAN + "Updating video " + bcolors.BOLD)
-        print(videoobjecttoupdate.title.encode("cp1252", errors="ignore"))  # Thanks, windows.
+        print(videoobjecttoupdate.title)
         print(bcolors.ENDC)
         dl(videoobjecttoupdate.shorturl)
 
@@ -95,7 +95,7 @@ def registervideo(video, collection_destination=None):
     else:  # If it's not new, update it
         print(
             bcolors.OKCYAN + "Video entry already exists. Updating " + bcolors.BOLD, end='')
-        print(videoobjecttoupdate.title.encode("cp1252", errors="ignore"), end='')
+        print(videoobjecttoupdate.title, end='')
         print(bcolors.ENDC, end=': ')
         videomodel.updatevideoentry(videoobjecttoupdate, video)
         newvideoid = videoobjecttoupdate.id
