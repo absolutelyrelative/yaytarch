@@ -8,6 +8,7 @@ from ..db import get_db
 from ..model import collectionmodel
 from ..model import videomodel
 from .config import *
+from .urltools import *
 
 
 # Helper function to begin the download process by only specifying id. Useful for refreshing videos on the webpage.
@@ -62,9 +63,11 @@ def dl(link, collection_destination=None):
         #    pass
         dictdump = ydl.sanitize_info(info)
 
-        print(bcolors.OKCYAN + "Downloading videos..." + bcolors.ENDC)
         # Get video type
+        # TODO: private, unlisted videos show as Nonetype in dictdump, it's impossible to extract id and save changes.
+        #       One way to solve this is to refresh using local shorturls.
         if dictdump is not None:
+            print(bcolors.OKCYAN + "Downloading videos..." + bcolors.ENDC)
             match dictdump['_type']:
                 case 'video':  # single video
                     # Download the video
@@ -85,6 +88,7 @@ def dl(link, collection_destination=None):
         else:
             # TODO: Add to database anyway and mark it as not downloaded.
             print(bcolors.BOLD + bcolors.FAIL + "Could not download video, skipping..." + bcolors.ENDC)
+            updatehiddenstatus(link)
 
 
 # Creates Video entry and registers to specified collection
@@ -223,3 +227,16 @@ def registerplaylist(playlistsubdct, thumbnailloc, jsonloc):
 
                 # Process the video locally
                 parsevideoinfo(dictdump, playlistsubdct['title'])
+
+# Attempt to extract short url from unavailable video link for updating purposes.
+# it's necessary for deleted/private/unlisted videos to properly search matches in the database by
+# extracting short url, something yt-dlp does not take care of in these cases.
+def updatehiddenstatus(link):
+    shurl = converttoshurl(link) if isurl(link) else link
+
+    videotohide = videomodel.getvideobyshorturl(shurl)
+    if videotohide is not None:
+        videotohide.availability = "private/unlisted"
+        registervideo(videotohide)
+    else:
+        print(bcolors.FAIL + "Could not find video locally to update status." + bcolors.ENDC)
