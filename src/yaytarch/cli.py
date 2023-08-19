@@ -3,6 +3,7 @@ from flask import current_app, Blueprint
 
 from .db import get_db
 from .model import configurationmodel
+from src.yaytarch.tools import backup
 
 # This blueprint takes care of the CLI and any future feature of it
 
@@ -26,3 +27,9 @@ def init_db(location):
 def init_db_command(downloadlocation):
     init_db(downloadlocation)
     click.echo('Initialised db.')
+
+
+@bp.cli.command('lazyrestore')
+@click.argument('location')
+def lazyrestore(location):
+    backup.lazyrestore(location)
