@@ -21,6 +21,9 @@ It is a yt-dlp frontend built with python & flask and it allows you to:
 ## Video view
 ![yaytarch_videoview](https://github.com/absolutelyrelative/yaytarch/blob/main/images/video_view.png?raw=true)
 
+## Prerequisites:
+Make sure you have ffmpeg installed, both yt-dlp & yaytarch need it. 
+
 ## Installation:
 You can choose to install the official release from PyPi or you can also build your own version:
 
@@ -67,7 +70,9 @@ Further information will come, for now see https://flask.palletsprojects.com/en/
 I take no responsibility in bad usage!
 
 ### Download video, playlist, or channel:
-Playlists will be organised automatically, single videos will be saved to the generic 'All Videos' category
+You can download videos via CLI or UI by pressing the + button.
+
+Playlists will be organised automatically, single videos will be saved to the generic 'All Videos' category.
 
 `flask --app yaytarch dl LINK`
 
