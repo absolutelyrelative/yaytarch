@@ -21,8 +21,62 @@ It is a yt-dlp frontend built with python & flask and it allows you to:
 ## Video view
 ![yaytarch_videoview](https://github.com/absolutelyrelative/yaytarch/blob/main/images/video_view.png?raw=true)
 
+## Installation:
+You can choose to install the official release from PyPi or you can also build your own version:
 
-Setting up & basic commands to come
+### Installation through pypi:
+Fetch and install yaytarch and its dependencies:
+
+`pip install yaytarch`
+
+And you're good to go, you can skip manual installation!
+
+### Build and install manually and locally:
+Clone the repository:
+
+`git clone https://github.com/absolutelyrelative/yaytarch.git`
+
+Build wheel:
+
+`python -m build --wheel`
+
+a dist/yaytarch-xx.whl will be generated.
+
+Install wheel:
+
+`pip install yaytarch-xx.whl`
+
+
+
+
+## Usage:
+
+### Initialise configuration:
+In order to run the app, a default download location needs to be given:
+
+`flask --app yaytarch init-db C:\PATH\TO\STORAGE\`
+
+### View videos:
+In order to browse videos locally you can use:
+
+`flask --app yaytarch run`
+
+NOTE: THIS is NOT the correct approach for deployment to a server. You NEED to set-up a correct secret key!
+Further information will come, for now see https://flask.palletsprojects.com/en/2.3.x/tutorial/deploy/#build-and-install
+
+I take no responsibility in bad usage!
+
+### Download video, playlist, or channel:
+Playlists will be organised automatically, single videos will be saved to the generic 'All Videos' category
+
+`flask --app yaytarch dl LINK`
+
+
+### Lazy restore:
+In case of any issue, you can always re-initialise the database and restore your previous progress. There will be two restore options, this is the so called 'lazy restore' which works by folder discovery. It should be used mainly when the database is unavailable.
+It can also be used to add local videos to the database, but a better way to do so will come soon.
+
+`flask --app yaytarch lazyrestore C:\PATH\TO\VIDEOS`
 
 Future features:
 - A less bad CSS / Style.
