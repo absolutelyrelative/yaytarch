@@ -3,7 +3,7 @@ from flask import current_app, Blueprint
 
 from .db import get_db
 from .model import configurationmodel
-from src.yaytarch.tools import backup
+from .tools import backup
 
 # This blueprint takes care of the CLI and any future feature of it
 

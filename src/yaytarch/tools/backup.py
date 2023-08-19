@@ -5,8 +5,8 @@ import json
 import os.path
 import re
 
-from src.yaytarch.model import videomodel
-from src.yaytarch.tools import videodownload
+from ..model import videomodel
+from . import videodownload
 
 # TODO: Add logging & output to show found files
 
