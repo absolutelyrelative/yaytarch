@@ -124,6 +124,7 @@ def lazyrestore(targetfolder: str):
 
 
 # Takes in json file, gets the important contents for the video in the database, and returns a video object.
+# TODO: Replace with the newer implementation in json video object
 def parsejsoninfo(jsonloc: str) -> videomodel.video:
     keys = ['id']  # important keys that MUST be present in the json
     if jsonloc is not None and jsonloc != '':  # if json file is found, extract info
