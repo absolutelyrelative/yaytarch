@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a>
+        <button class="buttonadd" onclick="openForm('add')">+</button>
+        <div class="curseddiv"><form method="POST"><input type="submit" class="buttonrefresh" name="buttonrefresh" value="↻" ></form></div>
+        <button class="buttonremove" onclick="openForm('remove')">─</button><br></div>
+{% for collection in collections %}
+<div class="responsive">
+  <div class="gallery">
+    <a href="{{ url_for('collections.viewcollection', collectionid=collection.id) }}">
+      <img src="{{ url_for('collections.load_picture', collectionid=collection.id) }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='imagenotfound.png') }}'" alt="" width="600" height="400">
+    </a>
+    <div class="desc"><b>{{ collection.title }}</b><br> short url: <br><small>{{ collection.shorturl }}</small></div>
+  </div>
+</div>
+  {% endfor %}
+
+
+    <!-- Add collection form -->
+    <div class="form-popup" id="addform">
+  <form method="POST" class="form-container">
+    <label for="collectionname"><b>Create Collection</b></label>
+      <input type="text" placeholder="Collection name" name="collectionnametoadd" required>
+      <input type="text" placeholder="YT short url" name="collectionurltoadd">
+    <button type="submit" class="btn">Create</button>
+    <button type="button" class="btn cancel" onclick="closeForm('add')">Close</button>
+  </form>
+</div>
+
+    <!-- Remove collection form -->
+    <div class="form-popup" id="removeform">
+  <form method="POST" class="form-container">
+    <label for="collectionname"><b>Remove Collection</b></label>
+      <input type="text" placeholder="Collection name" name="collectionnametoremove" required>
+    <button type="submit" class="btn">Remove</button>
+    <button type="button" class="btn cancel" onclick="closeForm('remove')">Close</button>
+  </form>
+</div>
+
+<script>
+function openForm(element) {
+    switch (element){
+        case 'add':
+            document.getElementById("addform").style.display = "block";
+            break;
+        case 'remove':
+            document.getElementById("removeform").style.display = "block";
+            break;
+        default:
+            break;
+    }
+}
+
+function closeForm(element) {
+    switch (element){
+        case 'add':
+            document.getElementById("addform").style.display = "none";
+            break;
+        case 'remove':
+            document.getElementById("removeform").style.display = "none";
+            break;
+        default:
+            break;
+    }
+}
+</script>
+{% endblock %}

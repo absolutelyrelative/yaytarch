@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a>
+        <button class="buttonadd" onclick="openForm('add')">+</button>
+        <div class="curseddiv"><form method="POST"><input type="submit" class="buttonrefresh" name="buttonrefresh" value="↻" ></form></div>
+    <br></div>
+{% for video in videos %}
+<div class="responsive">
+  <div class="gallery">
+    <a href="{{ url_for('videos.viewvideo', videoid=video.id) }}">
+      <img src="{{ url_for('videos.load_picture', videoid=video.id) }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='imagenotfound.png') }}'" alt="">
+    </a>
+    <div class="desc"><b> {{ video['title'] }} </b></div>
+      <div id="textbox">
+  <p class="alignleft">{{ video['duration_string'] }}</p>
+  <p class="aligncenter">{{ video['upload_date'] }}</p>
+  <p class="alignright">{{ video['view_count'] }} views</p>
+</div>
+
+  </div>
+</div>
+{% endfor %}
+
+<!-- Add video form -->
+    <div class="form-popup" id="addform">
+  <form method="POST" class="form-container">
+    <label for="videoname"><b>Add video</b></label>
+      <input type="text" placeholder="YT short url" name="videourl" required>
+    <button type="submit" class="btn">Add</button>
+    <button type="button" class="btn cancel" onclick="closeForm('add')">Close</button>
+  </form>
+</div>
+
+    <script>
+function openForm(element) {
+    switch (element){
+        case 'add':
+            document.getElementById("addform").style.display = "block";
+            break;
+        default:
+            break;
+    }
+}
+
+function closeForm(element) {
+    switch (element){
+        case 'add':
+            document.getElementById("addform").style.display = "none";
+            break;
+        default:
+            break;
+    }
+}
+</script>
+{% endblock %}

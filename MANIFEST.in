@@ -1,4 +1,4 @@
-include flaskr/schema.sql
-graft flaskr/static
-graft flaskr/templates
+include src/yaytarch/schema.sql
+graft src/yaytarch/static
+graft src/yaytarch/templates
 global-exclude *.pyc

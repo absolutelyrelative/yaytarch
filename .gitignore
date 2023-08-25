@@ -14,5 +14,12 @@ build/
 *.egg-info/
 
 list.txt
-static/*.mp4
-static/videos
+.idea
+templates/Brackets
+
+identifier.sqlite
+
+videos/
+references/
+pycharmrunconfigs/.run/
+codereferences/

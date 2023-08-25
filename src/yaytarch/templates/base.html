@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  </head>
+  <body style="background-image: url({{ url_for('static', filename='bg.png') }})">
+
+
+  {% block header %}{% endblock %}
+  {% for message in get_flashed_messages() %}
+
+  <!-- TODO: Add flash class -->
+  <div class="flash">{{ message }}</div>
+  {% endfor %}
+  {% block content %}{% endblock %}
+  
+  <div class="clearfix"></div>
+  </body>
+</html>

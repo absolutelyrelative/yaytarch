@@ -1,0 +1,255 @@
+html {
+    background: #e6e9e9;
+}
+body {
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+    color: #545454;
+    font-family: "Helvetica Neue", Helvetica, sans-serif;
+    font-size: 16px;
+    line-height: 1.5;
+    margin: 0 auto;
+    padding: 2em 2em 4em;
+}
+
+a {
+    color: dimgrey;
+    font-weight: 600;
+}
+
+div.toolbar {
+    background-color: white;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    height: 30px;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+div.playlistchoice {
+    background: transparent;
+    border-radius: 4px;
+    border: 2px solid #ccc;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+div.playlistchoice form{
+    display:inline;
+}
+div.playlistchoice:hover {
+    background: #dddddd;
+}
+
+div.video{
+    background: white;
+    border-radius: 4px;
+    border: 2px solid #ccc;
+}
+
+div.video h1 {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    height: auto;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+div.video h1:hover{
+    background: #dddddd;
+}
+
+div.video p {
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    height: auto;
+    padding-left: 8px;
+    padding-right: 8px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+}
+
+div.video p:hover{
+   /* background: repeating-linear-gradient(45deg, #ffffff, #ffffff 0.05%, #000000 0.5%); */
+    background: #dddddd;
+}
+
+div.gallery {
+    background: white;
+    border-radius: 4px;
+    border: 1.5px solid #ccc;
+  }
+  
+  div.gallery:hover {
+    border: 1.6px solid #545454;
+  }
+  
+  div.gallery img {
+    display: block;
+    margin: 0.4em auto;
+    max-width: 95%;
+    /*width: 100%;
+    height: auto;*/
+    width: 400px;
+    height: 200px;
+    max-height: 100%;
+  }
+  
+  div.desc {
+    padding: 2px;
+    text-align: center;
+    height: 75px;
+  }
+
+    #textbox {display:flex; flex-flow:row wrap;}
+    .alignleft {
+        font-family: "Helvetica Neue", Helvetica, sans-serif;
+        font-size: 14px;
+        width: 33.33%;
+        text-align: left;
+    }
+    .aligncenter {
+        font-family: "Helvetica Neue", Helvetica, sans-serif;
+        font-size: 14px;
+        width: 33.33%;
+        text-align: center;
+    }
+    .alignright {
+        font-family: "Helvetica Neue", Helvetica, sans-serif;
+        font-size: 14px;
+        width: 33.33%;
+        text-align: right;
+    }
+  
+  * {
+    box-sizing: border-box;
+  }
+  
+  .responsive {
+    padding: 10px 10px;
+    float: left;
+    width: 25%;
+    height: 350px;
+  }
+  
+  @media only screen and (max-width: 700px) {
+    .responsive {
+      width: 49.99999%;
+      margin: 6px 0;
+    }
+  }
+  
+  @media only screen and (max-width: 500px) {
+    .responsive {
+      width: 100%;
+    }
+  }
+  
+  .clearfix:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  .open-button {
+  background-color: #555;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  opacity: 0.8;
+  position: fixed;
+  bottom: 23px;
+  right: 28px;
+  width: 280px;
+}
+
+/* The popup form - hidden by default */
+.form-popup {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  right: 15px;
+  border: 3px solid #f1f1f1;
+  z-index: 9;
+}
+
+/* Add styles to the form container */
+.form-container {
+  max-width: 300px;
+  padding: 10px;
+  background-color: white;
+}
+
+/* Full-width input fields */
+.form-container input[type=text], .form-container input[type=password] {
+  width: 100%;
+  padding: 15px;
+  margin: 5px 0 22px 0;
+  border: none;
+  background: #f1f1f1;
+}
+
+/* When the inputs get focus, do something */
+.form-container input[type=text]:focus, .form-container input[type=password]:focus {
+  background-color: #ddd;
+  outline: none;
+}
+
+/* Set a style for the submit/login button */
+.form-container .btn {
+  background-color: #04AA6D;
+  color: white;
+  padding: 16px 20px;
+  border: none;
+  cursor: pointer;
+  width: 100%;
+  margin-bottom:10px;
+  opacity: 0.8;
+}
+
+/* Add a red background color to the cancel button */
+.form-container .cancel {
+  background-color: red;
+}
+
+/* Add some hover effects to buttons */
+.form-container .btn:hover, .open-button:hover {
+  opacity: 1;
+}
+
+.buttonadd{
+    width: 23px;
+    height: 23px;
+    font-weight: bold;
+    color: black;
+    background-color: #00CA4E;
+    float: right;
+    border-radius: 50%;
+}
+
+.buttonremove{
+    width: 23px;
+    height: 23px;
+    font-weight: bold;
+    color: black;
+    background-color: #FF605C;
+    float: right;
+    border-radius: 50%;
+}
+
+.buttonrefresh{
+    font-weight: bold;
+    color: black;
+    background-color: #FFBD44;
+    border-radius: 50%;
+}
+
+.curseddiv{
+    width: 23px;
+    height: 23px;
+    float: right;
+}

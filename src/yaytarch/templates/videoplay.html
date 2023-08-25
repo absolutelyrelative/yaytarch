@@ -1,0 +1,40 @@
+
+  {% extends 'base.html' %}
+
+  {% block content %}
+      <div class="toolbar"><a href="{{ url_for('collections.index') }}" style="text-decoration:none">Home</a>
+          <div class="curseddiv"><form method="POST"><input type="submit" class="buttonrefresh" name="buttonrefresh" value="↻" ></form></div><br></div>
+      <br>
+    <!-- !PAGE CONTENT! -->
+  <div class="center">
+    <div class="flash">{{ message }}</div>
+
+    <!-- Video playlist management !-->
+      <div class="video"> <!-- NEW !-->
+             {% for message in get_flashed_messages() %}
+    <div class="flash">{{ message }}</div>
+  {% endfor %}
+    <center>
+        <h1><a href="{{ video['webpage_url'] }}">{{ video.title }}</a> [{{ video['availability'] }}]</h1>
+        <!-- Video playlist management !-->
+      <div class="playlistchoice">Add to collection:
+          <form method="POST"><select name="value" id="value">
+            {% for notincollections in notincollections %}<option value="{{ notincollections.id }}">{{ notincollections.title }}</option>{% endfor %}</select><input type="submit" value="Add" id="button"></form>
+      Remove from collection:<form method="POST">
+      <select name="valueR" id="valueR">
+          {% for incollection in incollections %}<option value="{{ incollection.id }}">{{ incollection.title }}</option>{% endfor %}</select><input type="submit" value="Remove" id="buttonR"></form>
+        </div>
+          <video width="600" height="400" controls>
+            <source src="{{ url_for('videos.load_video', videoid=video.id) }}" type="video/mp4">
+            Your browser does not support the video tag.
+          </video>
+           <div id="textbox">
+               <p class="alignleft">Uploaded by <a href="{{ video['uploader_url'] }}">{{ video['channel'] }}</a> on {{ video['upload_date'] }}</p>
+          <p class="aligncenter">Last refreshed: {{ video['epoch'] }}</p>
+          <p class="alignright">{{ video['view_count'] }} 👁 {{ video['like_count'] }}👍</p>
+        </div>
+          <p> {{ video.description }} </p></center>
+    </div>
+  <!-- End page content -->
+  </div>
+  {% endblock %}
