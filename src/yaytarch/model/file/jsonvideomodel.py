@@ -2,28 +2,39 @@
 # check should be done here.
 # The difference between the other videomodel is that this will fetch information from json file and probably be more
 # flexible. The vision is to also make it more extensible should requested tags to download change.
+
+# yt-dlp will save most things in the JSON apart from some very problematic keys, and therefore the structure of
+# the json itself should not change much. These filters only apply to what the user wants to show.
 import json
+#from ...tools import backup
+from src.yaytarch.tools.backup import *
 
 # Filter for unwanted keys. TODO: Ideally, this should be fetched by configuration.
-def keyfilter(pair):
-    filters = ['title']
+def unwantedkeyfilter(pair):
+    filters = []
 
     key, value = pair
     for unwanted in filters:
         if key == unwanted:
-            return False
-        else:
             return True
+        else:
+            return False
 
 
 class video:
-
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
             setattr(self, key, value)
 
-    # TODO: Dummy function. It will be responsible to make sure the bare minimum tags are present.
-    def coherencycheck(self):
+# Singleton for a globally accessible, more resource efficient, list of discovered things.
+class folderdiscoveryresult(object):
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(folderdiscoveryresult, cls).__new__(cls)
+        return cls.instance
+
+    #  Return entry corresponding to shurl (name file without extensions)
+    def findentry(self, shurl: str):
         pass
 
 
@@ -38,8 +49,9 @@ def generatevideofromjsonfile(filename: str) -> video:
 
             # Remove unwanted keys. Necessary because jsons can get big.
             # A performance study should be done to see if it's worth it.
-            # TODO: This is a horrible approach and may destroy performance
-            data = dict(filter(keyfilter, data.items()))
+            # TODO: This is a horrible approach and may destroy performance.
+            #        It is also not working correctly. Fix.
+          #  data = dict(filter(unwantedkeyfilter, data.items()))
 
             # TODO: is this the right approach?
             for key in keys:
@@ -55,3 +67,20 @@ def generatevideofromjsonfile(filename: str) -> video:
                     extractedvideo.__setattr__('shorturl', value)
 
             return extractedvideo
+
+
+# Appends the generated video from json objects to the lazy discovery array, and attaches the list to the singleton.
+def folderdiscovery(location):
+    results = lazyfolderdiscovery(location)
+    videoobjectlist = []
+
+    for entry in results:
+        if entry.jsonfilename is not None and entry.jsonfilename != '':
+            video = generatevideofromjsonfile(entry.jsonfilename)
+            videoobjectlist.append(video)
+            #results.__getitem__(entry)
+            entry.__setattr__('localvideoobj', video)
+
+    singleton = folderdiscoveryresult()
+    singleton.__setattr__('discovered', results)
+    singleton.__setattr__('videoobjects', videoobjectlist)

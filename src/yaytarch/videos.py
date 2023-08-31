@@ -50,8 +50,15 @@ def load_video(videoid):
 
     return send_from_directory(dir_name, file_name)
 
+@bp.route("/video/source/<any:videoshurl>")
+def load_localvideo(videoshurl):
+    pass
 
-# TODO: If this works, merge with load_video to save half the IO calls.
+@bp.route("/video/source/thumb/<any:videoshurl>")
+def load_localpicture(videoshurl):
+    pass
+
+
 @bp.route("/video/source/thumb/<int:videoid>")
 def load_picture(videoid):
     video = videomodel.getvideobyid(videoid)

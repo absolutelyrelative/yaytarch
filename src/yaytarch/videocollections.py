@@ -1,4 +1,5 @@
 import os.path
+import click
 
 from .tools.outputformat import bcolors
 from .model import collectionmodel
@@ -6,6 +7,7 @@ from .model import collectionmodel
 from .model import videocollectionrelmodel as videocollectionmembershipmodel
 from .model import videomodel
 from .tools import videodownload
+from .model.file import jsonvideomodel
 from flask import (
     Blueprint, render_template, request, send_from_directory
 )
@@ -97,6 +99,14 @@ def viewcollection(collectionid):
     videos = videocollectionmembershipmodel.getvideocollectionmembershipbyid(collectionid, type="COLLECTION")
     return render_template('videolist.html', videos=videos)
 
+@bp.route('/local')
+def viewcwd():
+    jsonvideomodel.folderdiscovery(os.getcwd())  # Discovers all available videos in the folder
+    videos = jsonvideomodel.folderdiscoveryresult().videoobjects
+
+    return render_template('localvideolist.html', videos=videos)
+
+
 
 @bp.route("/collection/source/thumb/<int:collectionid>")
 def load_picture(collectionid):
@@ -105,3 +115,13 @@ def load_picture(collectionid):
     filename = os.path.basename(collection.thumbnail)
 
     return send_from_directory(dirname, filename)
+
+
+@bp.cli.command('cwd')
+def cwd():
+    pass
+
+@bp.cli.command('local')
+@click.argument('location', type=click.Path(exists=True))
+def local():
+    pass
