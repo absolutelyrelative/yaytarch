@@ -25,10 +25,11 @@ class Report:
 
 
 class LocalVideoFiles:
-    def __init__(self, videofilename: str, jsonfilename: str, thumbfilename: str):
+    def __init__(self, videofilename: str, jsonfilename: str, thumbfilename: str, shorturl: str):
         self.videofilename = videofilename
         self.jsonfilename = jsonfilename
         self.thumbfilename = thumbfilename
+        self.shorturl = shorturl
 
     # Generates a videomodel instance
     def returnvideoobject(self):
@@ -63,7 +64,7 @@ def lazyfolderdiscovery(targetfolder: str):
         for file in fileobjectlist:
             if file.extension in supportedformats:
                 # create object
-                tempvideo = LocalVideoFiles('', '', '')
+                tempvideo = LocalVideoFiles('', '', '', file.basename)
                 tempvideo.videofilename = os.path.join(targetfolder, file.basename + file.extension)
 
                 # attempt to find appropriate json

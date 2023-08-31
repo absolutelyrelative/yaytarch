@@ -8,8 +8,8 @@
 {% for video in videos %}
 <div class="responsive">
   <div class="gallery">
-    <a href="{{ url_for('videos.viewlocalvideo', videoid=video.id) }}">
-      <img src="{{ url_for('videos.load_localpicture', videoid=video.id) }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='imagenotfound.png') }}'" alt="">
+    <a href="{{ url_for('videos.viewlocalvideo', videoshurl=video.shorturl) }}">
+      <img src="{{ url_for('videos.load_localpicture', videoshurl=video.shorturl) }}" onerror="this.onerror=null; this.src='{{ url_for('static', filename='imagenotfound.png') }}'" alt="">
     </a>
     <div class="desc"><b> {{ video.title }} </b></div>
       <div id="textbox">

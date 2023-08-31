@@ -34,8 +34,16 @@ class folderdiscoveryresult(object):
         return cls.instance
 
     #  Return entry corresponding to shurl (name file without extensions)
-    def findentry(self, shurl: str):
-        pass
+    #  TODO: Really, please, find a better name for this. Tech debt is increasing exponentially.
+    def find_discovered_entry(self, shurl: str):
+        if hasattr(self, 'discovered'):
+            for entry in self.discovered:
+                if entry.shorturl == shurl:
+                    return entry
+
+
+
+
 
 
 # This function is responsible for parsing a specified json file and returning the appropriate video object.
@@ -83,4 +91,4 @@ def folderdiscovery(location):
 
     singleton = folderdiscoveryresult()
     singleton.__setattr__('discovered', results)
-    singleton.__setattr__('videoobjects', videoobjectlist)
+    singleton.__setattr__('videoobjects', videoobjectlist) # TODO: I think this is redundant. Discovered already has this inside entry.
