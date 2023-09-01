@@ -6,8 +6,9 @@
 # yt-dlp will save most things in the JSON apart from some very problematic keys, and therefore the structure of
 # the json itself should not change much. These filters only apply to what the user wants to show.
 import json
-#from ...tools import backup
+# from ...tools import backup
 from src.yaytarch.tools.backup import *
+
 
 # Filter for unwanted keys. TODO: Ideally, this should be fetched by configuration.
 def unwantedkeyfilter(pair):
@@ -26,6 +27,7 @@ class video:
         for key, value in kwargs.items():
             setattr(self, key, value)
 
+
 # Singleton for a globally accessible, more resource efficient, list of discovered things.
 class folderdiscoveryresult(object):
     def __new__(cls):
@@ -42,10 +44,6 @@ class folderdiscoveryresult(object):
                     return entry
 
 
-
-
-
-
 # This function is responsible for parsing a specified json file and returning the appropriate video object.
 # Returns None if generation failed.
 def generatevideofromjsonfile(filename: str) -> video:
@@ -59,7 +57,7 @@ def generatevideofromjsonfile(filename: str) -> video:
             # A performance study should be done to see if it's worth it.
             # TODO: This is a horrible approach and may destroy performance.
             #        It is also not working correctly. Fix.
-          #  data = dict(filter(unwantedkeyfilter, data.items()))
+            #  data = dict(filter(unwantedkeyfilter, data.items()))
 
             # TODO: is this the right approach?
             for key in keys:
@@ -86,9 +84,10 @@ def folderdiscovery(location):
         if entry.jsonfilename is not None and entry.jsonfilename != '':
             video = generatevideofromjsonfile(entry.jsonfilename)
             videoobjectlist.append(video)
-            #results.__getitem__(entry)
+            # results.__getitem__(entry)
             entry.__setattr__('localvideoobj', video)
 
     singleton = folderdiscoveryresult()
     singleton.__setattr__('discovered', results)
-    singleton.__setattr__('videoobjects', videoobjectlist) # TODO: I think this is redundant. Discovered already has this inside entry.
+    singleton.__setattr__('videoobjects',
+                          videoobjectlist)  # TODO: I think this is redundant. Discovered already has this inside entry.

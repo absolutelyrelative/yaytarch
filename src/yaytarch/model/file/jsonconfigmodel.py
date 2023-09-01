@@ -3,6 +3,7 @@
 #       This solution is for 3) which will come after 2) is completed.
 import json
 
+
 class configuration:
     def __init__(self, **kwargs):
         for key, value in kwargs.items():
@@ -12,7 +13,6 @@ class configuration:
 # This function is responsible for parsing a specified json file and returning the appropriate video object.
 # Returns None if generation failed.
 def generateconfigfromjsonfile(filename: str) -> configuration:
-
     if filename is not None and filename != '':  # if json file is found, extract info
         with open(filename) as jsonfile:
             data = json.load(jsonfile)

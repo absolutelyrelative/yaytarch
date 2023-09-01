@@ -1,15 +1,11 @@
 import json
-import contextlib
 import os
 
-import yt_dlp.utils
 from yt_dlp import YoutubeDL
 
-from db import get_db
-from model import collectionmodel
-from model import videomodel
+from model.db import collectionmodel, videomodel
 from .outputformat import bcolors
-from .config import DlOptions
+from .config import DlOptions, DlArguments
 from .urltools import *
 
 
@@ -59,9 +55,9 @@ def dl(link, collection_destination=None):
     with YoutubeDL(opts.ytdlp_options) as ydl:
         print(bcolors.OKCYAN + "Downloading & parsing information..." + bcolors.ENDC)
         # with contextlib.suppress(Exception):  # Necessary to suppress ytdlp exceptions in a playlist
-        #try:
+        # try:
         info = ydl.extract_info(link, download=False)
-        #except yt_dlp.utils.DownloadError as dlerror:
+        # except yt_dlp.utils.DownloadError as dlerror:
         #    pass
         dictdump = ydl.sanitize_info(info)
 
@@ -223,12 +219,14 @@ def registerplaylist(playlistsubdct, thumbnailloc, jsonloc):
         for entry in playlistsubdct['entries']:
             # TODO: Find a better, more universal solution. This check on availability might only work on yt.
             # Redownload information
-            if entry is not None and (entry['availability'] != 'public' or entry['availability'] != 'unlisted'):  # entry is none if video is blocked / private (?)
+            if entry is not None and (entry['availability'] != 'public' or entry[
+                'availability'] != 'unlisted'):  # entry is none if video is blocked / private (?)
                 info = ydl.extract_info(entry['id'], download=False)
                 dictdump = ydl.sanitize_info(info)
 
                 # Process the video locally
                 parsevideoinfo(dictdump, playlistsubdct['title'])
+
 
 # Attempt to extract short url from unavailable video link for updating purposes.
 # it's necessary for deleted/private/unlisted videos to properly search matches in the database by

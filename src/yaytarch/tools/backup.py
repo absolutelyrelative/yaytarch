@@ -5,8 +5,9 @@ import json
 import os.path
 import re
 
-from model import videomodel
+from model.db import videomodel
 from . import videodownload
+
 
 # TODO: Add logging & output to show found files
 
@@ -113,7 +114,6 @@ def lazyrestore(targetfolder: str):
                         and localvideo.videofilename is not None):
                     dbvideo.title = localvideo.videofilename
                     dbvideo.availability = 'Local'
-
 
                 # Register video
                 videodownload.registervideo(dbvideo)

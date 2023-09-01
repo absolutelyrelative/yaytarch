@@ -42,6 +42,7 @@ def parseresultintoobject(result):
 
     return videoobject
 
+
 # Gets all videos in a list
 def getallvideos():
     db = get_db()
@@ -59,6 +60,7 @@ def getallvideos():
             videolist.append(parseresultintoobject(entry))
         return videolist
     return None
+
 
 # Fetches video object from the database. Returns a video object if the operation is carried out succesfully,
 # None if not.

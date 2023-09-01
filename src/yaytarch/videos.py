@@ -5,8 +5,7 @@ from flask import (
 
 from tools import videodownload
 from tools.config import *
-from model import videocollectionrelmodel
-from model import videomodel
+from model.db import videocollectionrelmodel, videomodel
 from model.file import jsonvideomodel
 
 # This blueprint takes care of the video view page and any future feature of it
@@ -41,6 +40,7 @@ def viewvideo(videoid):
     return render_template('videoplay.html', video=video, incollections=incollections,
                            notincollections=notincollections)
 
+
 @bp.route('/video/<string:videoshurl>')
 def viewlocalvideo(videoshurl):
     discoverysingleton = jsonvideomodel.folderdiscoveryresult()
@@ -59,6 +59,7 @@ def load_video(videoid):
 
     return send_from_directory(dir_name, file_name)
 
+
 @bp.route("/video/source/<string:videoshurl>")
 def load_localvideo(videoshurl):
     discoverysingleton = jsonvideomodel.folderdiscoveryresult()
@@ -68,6 +69,7 @@ def load_localvideo(videoshurl):
             file_name = os.path.basename(match.videofilename)
             dir_name = os.path.dirname(match.videofilename)
             return send_from_directory(dir_name, file_name)
+
 
 @bp.route("/video/source/thumb/<string:videoshurl>")
 def load_localpicture(videoshurl):

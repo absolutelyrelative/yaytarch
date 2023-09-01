@@ -2,7 +2,7 @@ import click
 from flask import current_app, Blueprint
 
 from db import get_db
-from model import configurationmodel
+from model.db import configurationmodel
 from tools import backup
 
 # This blueprint takes care of the CLI and any future feature of it

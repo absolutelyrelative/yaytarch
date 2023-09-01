@@ -59,6 +59,7 @@ def findcollectionbyname(name):
     else:
         return None
 
+
 def findcollectionbyshorturl(shorturl: str):
     db = get_db()
     try:

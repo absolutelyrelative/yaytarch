@@ -1,11 +1,7 @@
 import os.path
-import click
 
 from tools.outputformat import bcolors
-from model import collectionmodel
-from model import collectionmodel
-from model import videocollectionrelmodel as videocollectionmembershipmodel
-from model import videomodel
+from model.db import collectionmodel, videocollectionrelmodel as videocollectionmembershipmodel, videomodel
 from tools import videodownload
 from model.file import jsonvideomodel
 from flask import (
@@ -57,7 +53,7 @@ def index():
                 # attempt to remove all collection, video relationships and the collection entry itself
                 if videocollectionmembershipmodel.removeallcollectionentries(
                         collectionobj.id) is not None and collectionmodel.removecollection(
-                        collectionobj.id) is not None:
+                    collectionobj.id) is not None:
                     print(bcolors.OKGREEN + "Collection removed." + bcolors.ENDC)
                 else:
                     print(
@@ -70,7 +66,6 @@ def index():
         # Request type: update
         if 'buttonrefresh' in request.form.keys():
             videodownload.refreshallvideos()
-
 
     collections = collectionmodel.getallcollections()
     return render_template('collections.html', collections=collections)
@@ -94,10 +89,9 @@ def viewcollection(collectionid):
         if 'buttonrefresh' in request.form.keys():
             videodownload.dlplaylistbyid(collectionid)
 
-
-
     videos = videocollectionmembershipmodel.getvideocollectionmembershipbyid(collectionid, type="COLLECTION")
     return render_template('videolist.html', videos=videos)
+
 
 @bp.route('/local')
 def viewcwd():
@@ -105,7 +99,6 @@ def viewcwd():
     videos = jsonvideomodel.folderdiscoveryresult().videoobjects
 
     return render_template('localvideolist.html', videos=videos)
-
 
 
 @bp.route("/collection/source/thumb/<int:collectionid>")
