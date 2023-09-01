@@ -1,13 +1,13 @@
 import os.path
 import click
 
-from .tools.outputformat import bcolors
-from .model import collectionmodel
-from .model import collectionmodel
-from .model import videocollectionrelmodel as videocollectionmembershipmodel
-from .model import videomodel
-from .tools import videodownload
-from .model.file import jsonvideomodel
+from tools.outputformat import bcolors
+from model import collectionmodel
+from model import collectionmodel
+from model import videocollectionrelmodel as videocollectionmembershipmodel
+from model import videomodel
+from tools import videodownload
+from model.file import jsonvideomodel
 from flask import (
     Blueprint, render_template, request, send_from_directory
 )
@@ -115,13 +115,3 @@ def load_picture(collectionid):
     filename = os.path.basename(collection.thumbnail)
 
     return send_from_directory(dirname, filename)
-
-
-@bp.cli.command('cwd')
-def cwd():
-    pass
-
-@bp.cli.command('local')
-@click.argument('location', type=click.Path(exists=True))
-def local():
-    pass

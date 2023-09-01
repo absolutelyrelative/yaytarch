@@ -4,7 +4,7 @@
 # self.params['logger'].debug(message)
 import os.path
 
-from ..model import configurationmodel
+from model import configurationmodel
 from .outputformat import bcolors
 
 

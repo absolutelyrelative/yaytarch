@@ -3,11 +3,11 @@ from flask import (
     Blueprint, render_template, send_from_directory, request
 )
 
-from .tools import videodownload
-from .tools.config import *
-from .model import videocollectionrelmodel
-from .model import videomodel
-from .model.file import jsonvideomodel
+from tools import videodownload
+from tools.config import *
+from model import videocollectionrelmodel
+from model import videomodel
+from model.file import jsonvideomodel
 
 # This blueprint takes care of the video view page and any future feature of it
 

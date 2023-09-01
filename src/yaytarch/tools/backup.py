@@ -5,7 +5,7 @@ import json
 import os.path
 import re
 
-from ..model import videomodel
+from model import videomodel
 from . import videodownload
 
 # TODO: Add logging & output to show found files

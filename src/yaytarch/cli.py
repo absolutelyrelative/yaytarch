@@ -1,35 +1,18 @@
-import click
-from flask import current_app, Blueprint
-
-from .db import get_db
-from .model import configurationmodel
-from .tools import backup
-
-# This blueprint takes care of the CLI and any future feature of it
-
-bp = Blueprint('cli', __name__)
+import sys
+import threading
+import webbrowser
+from view import create_app
 
 
-def init_db(location):
-    db = get_db()
-
-    # Run setup queries
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
-
-    # Save download location setting
-    configuration = configurationmodel.configuration(location, "", "")
-    configurationmodel.initialconfiguration(configuration)
+def cli():
+    args = sys.argv[1:]
+    webbrowser.open(f"http://127.0.0.1:5000/")
+    view()
 
 
-@bp.cli.command('init-db')
-@click.argument("downloadlocation")
-def init_db_command(downloadlocation):
-    init_db(downloadlocation)
-    click.echo('Initialised db.')
+def view():
+    app = create_app()
+    threading.Thread(target=lambda: app.run(port=5000)).run()
 
-
-@bp.cli.command('lazyrestore')
-@click.argument('location')
-def lazyrestore(location):
-    backup.lazyrestore(location)
+if __name__ == "__main__":
+    cli()
