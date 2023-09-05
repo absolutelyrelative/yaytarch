@@ -48,9 +48,10 @@ def refreshallvideos():
 
 
 # Gets video or playlist by link, automatically generates collection for playlists, and adds videos to
-# respective collections
-def dl(link, collection_destination=None):
-    opts = DlOptions(None)
+# respective collections.
+# If local is True, downloads the video, saves json and thumb, but does not add it to database.
+def dl(link, collection_destination=None, local=False):
+    opts = DlOptions(None, local)
 
     with YoutubeDL(opts.ytdlp_options) as ydl:
         print(bcolors.OKCYAN + "Downloading & parsing information..." + bcolors.ENDC)
@@ -70,23 +71,24 @@ def dl(link, collection_destination=None):
                 case 'video':  # single video
                     # Download the video
                     ydl.download(link)
-                    # Process the video locally
-                    parsevideoinfo(dictdump, collection_destination)
+                    # Process the video, locally if necessary
+                    parsevideoinfo(dictdump, collection_destination, local)
 
                 # PROBLEM! ONLY this is called when playlists are found, it doesn't cycle through.
                 case 'playlist':  # playlist AND channels
                     # Download the playlist
                     ydl.download(link)
 
-                    # Process the playlist locally
-                    parseplaylistinfo(dictdump)
+                    # Process the playlist, locally if necessary
+                    parseplaylistinfo(dictdump, local)
 
                 case _:  # may be required for other platforms / channels
                     pass
         else:
             # TODO: Add to database anyway and mark it as not downloaded.
             print(bcolors.BOLD + bcolors.FAIL + "Could not download video, skipping..." + bcolors.ENDC)
-            updatehiddenstatus(link)
+            if local == False:  # TODO: Find a way to do this when local is True
+                updatehiddenstatus(link)
 
 
 # Creates Video entry and registers to specified collection
@@ -117,13 +119,14 @@ def registervideo(video, collection_destination=None):
                                                       collectionmodel.findcollectionbyname(collection_destination).id)
 
 
-# Helper function to configure videos for local use.
+# Helper function to configure videos for local use. If local is True, it operates without a db.
 
-def parsevideoinfo(dictdump, collection_destination=None):
-    opts = DlOptions(None)
+def parsevideoinfo(dictdump, collection_destination=None, local=False):
+    opts = DlOptions(None, local)
 
     try:
         # Parse keys we need
+        # TODO: Change this for local usage ?
         subdct = {key: dictdump[key] for key in DlArguments.videokeys}
 
         # Create the local video objects
@@ -139,17 +142,18 @@ def parsevideoinfo(dictdump, collection_destination=None):
         with open(jsonloc, 'w') as outfile:
             json.dump(subdct, outfile, indent='\t')
 
-        # Create video object
-        videoobject = videomodel.video(0, subdct['id'], subdct['title'], subdct['description'],
-                                       subdct['uploader_url'], subdct['view_count'], subdct['webpage_url'],
-                                       subdct['like_count'],
-                                       subdct['availability'], subdct['duration_string'], subdct['ext'],
-                                       subdct['width'],
-                                       subdct['height'], subdct['upload_date'], subdct['channel'], subdct['epoch'],
-                                       thumbloc, jsonloc, loc)
+        if local is False:  # add to database only if local is False
+            # Create video object
+            videoobject = videomodel.video(0, subdct['id'], subdct['title'], subdct['description'],
+                                           subdct['uploader_url'], subdct['view_count'], subdct['webpage_url'],
+                                           subdct['like_count'],
+                                           subdct['availability'], subdct['duration_string'], subdct['ext'],
+                                           subdct['width'],
+                                           subdct['height'], subdct['upload_date'], subdct['channel'], subdct['epoch'],
+                                           thumbloc, jsonloc, loc)
 
-        # Add or update video to database
-        registervideo(videoobject, collection_destination)
+            # Add or update video to database
+            registervideo(videoobject, collection_destination)
     except KeyError as keyerror:
         print(bcolors.WARNING + "Problem parsing video information." + bcolors.ENDC)
         print("{}".format(keyerror))
@@ -160,8 +164,8 @@ def parsevideoinfo(dictdump, collection_destination=None):
 
 # Helper function to configure playlists for local use.
 
-def parseplaylistinfo(dictdump):
-    opts = DlOptions(None)
+def parseplaylistinfo(dictdump, local=False):
+    opts = DlOptions(None, local)
 
     try:
         # Cycle through keys
@@ -179,39 +183,39 @@ def parseplaylistinfo(dictdump):
         with open(jsonloc, 'w') as outfile:
             json.dump(playlistsubdct, outfile, indent='\t')
 
-        registerplaylist(playlistsubdct, thumbnailloc, jsonloc)
+        registerplaylist(playlistsubdct, thumbnailloc, jsonloc, local)
     except KeyError as keyerror:
         print(bcolors.WARNING + "Problem adding video." + bcolors.ENDC)
         print("{}".format(keyerror))
 
 
 # Creates collection entry and registers to specified collection. Cycles and parses through each video of the playlist
-#   and registers it to the collection.
+#   and registers it to the collection. If local is True, it operates without a db.
 
-def registerplaylist(playlistsubdct, thumbnailloc, jsonloc):
+def registerplaylist(playlistsubdct, thumbnailloc, jsonloc, local=False):
     opts = DlOptions(None)
 
-    # create new collection object
-    newcollection = collectionmodel.videocollection(0, playlistsubdct['id'],
-                                                    playlistsubdct['title'],
-                                                    playlistsubdct['availability'],
-                                                    playlistsubdct['modified_date'],
-                                                    playlistsubdct['playlist_count'],
-                                                    playlistsubdct['uploader_url'],
-                                                    playlistsubdct['epoch'], thumbnailloc,
-                                                    jsonloc)
+    if local == False:  # create new collection object
+        newcollection = collectionmodel.videocollection(0, playlistsubdct['id'],
+                                                        playlistsubdct['title'],
+                                                        playlistsubdct['availability'],
+                                                        playlistsubdct['modified_date'],
+                                                        playlistsubdct['playlist_count'],
+                                                        playlistsubdct['uploader_url'],
+                                                        playlistsubdct['epoch'], thumbnailloc,
+                                                        jsonloc)
 
-    # Check if collection already exists
-    oldcollection = collectionmodel.findcollectionbyshorturl(playlistsubdct['id'])
-    if oldcollection is None:
-        print(bcolors.OKCYAN + "Collection doesn't exist. Creating..." + bcolors.ENDC)
-        newcollectionid = collectionmodel.createvideocollectionentry(newcollection)
-        if newcollectionid is None:
-            raise Exception("Could not create video collection entry.")
-    else:
-        print(bcolors.OKCYAN + "Collection already exists. Updating videos..." + bcolors.ENDC)
-        collectionmodel.updatecollectionentry(oldcollection,
-                                              newcollection)
+        # Check if collection already exists
+        oldcollection = collectionmodel.findcollectionbyshorturl(playlistsubdct['id'])
+        if oldcollection is None:
+            print(bcolors.OKCYAN + "Collection doesn't exist. Creating..." + bcolors.ENDC)
+            newcollectionid = collectionmodel.createvideocollectionentry(newcollection)
+            if newcollectionid is None:
+                raise Exception("Could not create video collection entry.")
+        else:
+            print(bcolors.OKCYAN + "Collection already exists. Updating videos..." + bcolors.ENDC)
+            collectionmodel.updatecollectionentry(oldcollection,
+                                                  newcollection)
 
     # try to register each video individually
     # because of course the video entries in the playlist info don't share the same keys.
@@ -225,12 +229,13 @@ def registerplaylist(playlistsubdct, thumbnailloc, jsonloc):
                 dictdump = ydl.sanitize_info(info)
 
                 # Process the video locally
-                parsevideoinfo(dictdump, playlistsubdct['title'])
+                parsevideoinfo(dictdump, playlistsubdct['title'], local)
 
 
 # Attempt to extract short url from unavailable video link for updating purposes.
 # it's necessary for deleted/private/unlisted videos to properly search matches in the database by
 # extracting short url, something yt-dlp does not take care of in these cases.
+# TODO: Fix for local use
 def updatehiddenstatus(link):
     shurl = converttoshurl(link) if isurl(link) else link
 

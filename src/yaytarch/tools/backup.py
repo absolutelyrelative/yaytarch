@@ -62,6 +62,7 @@ def lazyfolderdiscovery(targetfolder: str):
             fileobjectlist.append(extractfilename(entry))
 
         localvideoobjects = []
+        # TODO: There is a bug here. Not the right files are being removed from the list.
         for file in fileobjectlist:
             if file.extension in supportedformats:
                 # create object
