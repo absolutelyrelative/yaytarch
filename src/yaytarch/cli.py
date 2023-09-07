@@ -2,7 +2,7 @@ import sys
 import threading
 import webbrowser
 import argparse
-from .view import create_app
+from .__init__ import create_app
 from .tools import videodownload
 
 
@@ -11,6 +11,7 @@ def cli():
     argparser = argparse.ArgumentParser()
     argparser.add_argument("-f", "--folder", help="Open viewer on folder.", default='', action='store_true')
     argparser.add_argument("-d", "--download", help="Download video, playlist, or channel.", default='')
+    argparser.add_argument("-i", "--initdb", help="Initialise database. Specify the default download location.", default='')
     args = argparser.parse_args()
 
     #  -f argument
@@ -24,9 +25,10 @@ def cli():
         sys.exit(0)
 
     #  no argument
-    if args.folder == '' and args.download == '':
-        webbrowser.open("http://127.0.0.1:5000")
-        view()
+    #  TODO: Fix app context
+    #if args.folder == '' and args.download == '':
+    #    webbrowser.open("http://127.0.0.1:5000")
+    #    view()
 
 
 

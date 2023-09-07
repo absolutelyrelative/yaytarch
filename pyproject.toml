@@ -16,7 +16,7 @@ requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project.scripts]
-yaytarch = "yaytarch.__main__:cli"
+yaytarch = "yaytarch.cli:cli"
 
 [project.urls]
 "Homepage" = "https://github.com/absolutelyrelative/yaytarch"

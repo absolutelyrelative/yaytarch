@@ -67,6 +67,8 @@ Within the folder run:
 
 `yaytarch -f`
 
+A browser window will be automatically opened.
+
 ### (DB) Initialise configuration:
 In order to run the app, a default download location needs to be given:
 
