@@ -2,8 +2,8 @@ import sys
 import threading
 import webbrowser
 import argparse
-from view import create_app
-from tools import videodownload
+from .view import create_app
+from .tools import videodownload
 
 
 # Defines the behaviour of the user side CLI

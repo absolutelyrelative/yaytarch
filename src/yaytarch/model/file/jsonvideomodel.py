@@ -7,7 +7,7 @@
 # the json itself should not change much. These filters only apply to what the user wants to show.
 import json
 # from ...tools import backup
-from src.yaytarch.tools.backup import *
+from ...tools.backup import *
 
 
 # Filter for unwanted keys. TODO: Ideally, this should be fetched by configuration.

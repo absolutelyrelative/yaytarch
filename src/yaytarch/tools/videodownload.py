@@ -3,7 +3,7 @@ import os
 
 from yt_dlp import YoutubeDL
 
-from model.db import collectionmodel, videomodel
+from ..model.db import collectionmodel, videomodel
 from .outputformat import bcolors
 from .config import DlOptions, DlArguments
 from .urltools import *

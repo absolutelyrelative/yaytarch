@@ -1,12 +1,13 @@
 import os.path
 
-from tools.outputformat import bcolors
-from model.db import collectionmodel, videocollectionrelmodel as videocollectionmembershipmodel, videomodel
-from tools import videodownload
-from model.file import jsonvideomodel
 from flask import (
     Blueprint, render_template, request, send_from_directory
 )
+
+from .tools.outputformat import bcolors
+from .model.db import collectionmodel, videocollectionrelmodel as videocollectionmembershipmodel, videomodel
+from .tools import videodownload
+from .model.file import jsonvideomodel
 
 # This blueprint shows all the available collections and any future feature related to collections
 

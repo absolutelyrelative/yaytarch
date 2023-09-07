@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-import db, videocollections, videos, clibp
+from . import db, videocollections, videos, clibp
 
 
 def create_app(test_config=None):
