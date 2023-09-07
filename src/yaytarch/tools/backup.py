@@ -5,15 +5,11 @@ import json
 import os.path
 import re
 
-from ..model import videomodel
+from ..model.db import videomodel
 from . import videodownload
 
-# TODO: Add logging & output to show found files
 
-# Custom exceptions for importing operation
-class ImportException(Exception):
-    def __init__(self, message):
-        self.message = message
+# TODO: Add logging & output to show found files
 
 
 # Class to handle status
@@ -25,14 +21,25 @@ class Report:
 
 
 class LocalVideoFiles:
-    def __init__(self, videofilename: str, jsonfilename: str, thumbfilename: str):
+    def __init__(self, videofilename: str, jsonfilename: str, thumbfilename: str, shorturl: str):
         self.videofilename = videofilename
         self.jsonfilename = jsonfilename
         self.thumbfilename = thumbfilename
+        self.shorturl = shorturl
 
-    # Generates a videomodel instance
-    def returnvideoobject(self):
-        pass
+    def __str__(self):
+        message = ''
+        if self.shorturl is not None:
+            message += self.shorturl + ': '
+        if self.videofilename is not None:
+            message += self.videofilename + ', '
+        if self.thumbfilename is not None:
+            message += self.thumbfilename + ', '
+        if self.jsonfilename is not None:
+            message += self.jsonfilename
+        if message != '':
+            return message
+        return 'Empty'
 
 
 class File:  # Another reason windows sucks.
@@ -60,34 +67,34 @@ def lazyfolderdiscovery(targetfolder: str):
             fileobjectlist.append(extractfilename(entry))
 
         localvideoobjects = []
-        for file in fileobjectlist:
-            if file.extension in supportedformats:
-                # create object
-                tempvideo = LocalVideoFiles('', '', '')
-                tempvideo.videofilename = os.path.join(targetfolder, file.basename + file.extension)
 
-                # attempt to find appropriate json
-                jsonfile = next((subentry for subentry in fileobjectlist if subentry.basename == file.basename and
-                                 subentry.extension == '.json'), None)
-                if jsonfile is not None:
-                    tempvideo.jsonfilename = os.path.join(targetfolder, jsonfile.basename + jsonfile.extension)
-                    fileobjectlist.remove(jsonfile)
+        videofilteredlist = [x for x in fileobjectlist if x.extension in supportedformats]
+        jsonfilteredlist = [x for x in fileobjectlist if x.extension == '.json']
+        thumbfilteredlist = [x for x in fileobjectlist if x.extension == '.jpg']
 
-                # attempt to find appropriate image
-                jpgfile = next((subentry for subentry in fileobjectlist if subentry.basename == file.basename and
-                                subentry.extension == '.jpg'), None)
-                if jpgfile is not None:
-                    tempvideo.thumbfilename = os.path.join(targetfolder, jpgfile.basename + jpgfile.extension)
-                    fileobjectlist.remove(jpgfile)
+        for file in videofilteredlist:
+            # create object
+            tempvideo = LocalVideoFiles('', '', '', file.basename)
+            tempvideo.videofilename = os.path.join(targetfolder, file.basename + file.extension)
 
-                # remove entry from fileobjects
-                fileobjectlist.remove(file)
-                # append to video object list
-                localvideoobjects.append(tempvideo)
+            # attempt to find appropriate json
+            jsonfile = next((subentry for subentry in jsonfilteredlist if subentry.basename == file.basename and
+                             subentry.extension == '.json'), None)
+            if jsonfile is not None:
+                tempvideo.jsonfilename = os.path.join(targetfolder, jsonfile.basename + jsonfile.extension)
+
+            # attempt to find appropriate image
+            jpgfile = next((subentry for subentry in thumbfilteredlist if subentry.basename == file.basename and
+                            subentry.extension == '.jpg'), None)
+            if jpgfile is not None:
+                tempvideo.thumbfilename = os.path.join(targetfolder, jpgfile.basename + jpgfile.extension)
+
+            # append to video object list
+            localvideoobjects.append(tempvideo)
 
         return localvideoobjects
     else:
-        pass  # TODO: Add exception ?
+        print("Path is not a valid folder.")
 
 
 # Creates the video objects and inserts them in the database.
@@ -112,7 +119,6 @@ def lazyrestore(targetfolder: str):
                         and localvideo.videofilename is not None):
                     dbvideo.title = localvideo.videofilename
                     dbvideo.availability = 'Local'
-
 
                 # Register video
                 videodownload.registervideo(dbvideo)

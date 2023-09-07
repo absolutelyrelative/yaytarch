@@ -5,8 +5,8 @@ from flask import (
 
 from .tools import videodownload
 from .tools.config import *
-from .model import videocollectionrelmodel
-from .model import videomodel
+from .model.db import videocollectionrelmodel, videomodel
+from .model.file import jsonvideomodel
 
 # This blueprint takes care of the video view page and any future feature of it
 
@@ -41,6 +41,15 @@ def viewvideo(videoid):
                            notincollections=notincollections)
 
 
+@bp.route('/video/<string:videoshurl>')
+def viewlocalvideo(videoshurl):
+    discoverysingleton = jsonvideomodel.folderdiscoveryresult()
+    if hasattr(discoverysingleton, 'discovered'):
+        match = discoverysingleton.find_discovered_entry(videoshurl)
+        if match is not None and match.localvideoobj is not None:
+            return render_template('localvideoplay.html', video=match.localvideoobj)
+
+
 @bp.route("/video/source/<int:videoid>")
 def load_video(videoid):
     video = videomodel.getvideobyid(videoid)
@@ -51,7 +60,28 @@ def load_video(videoid):
     return send_from_directory(dir_name, file_name)
 
 
-# TODO: If this works, merge with load_video to save half the IO calls.
+@bp.route("/video/source/<string:videoshurl>")
+def load_localvideo(videoshurl):
+    discoverysingleton = jsonvideomodel.folderdiscoveryresult()
+    if hasattr(discoverysingleton, 'discovered'):
+        match = discoverysingleton.find_discovered_entry(videoshurl)
+        if match is not None:
+            file_name = os.path.basename(match.videofilename)
+            dir_name = os.path.dirname(match.videofilename)
+            return send_from_directory(dir_name, file_name)
+
+
+@bp.route("/video/source/thumb/<string:videoshurl>")
+def load_localpicture(videoshurl):
+    discoverysingleton = jsonvideomodel.folderdiscoveryresult()
+    if hasattr(discoverysingleton, 'discovered'):
+        match = discoverysingleton.find_discovered_entry(videoshurl)
+        if match is not None:
+            file_name = os.path.basename(match.thumbfilename)
+            dir_name = os.path.dirname(match.thumbfilename)
+            return send_from_directory(dir_name, file_name)
+
+
 @bp.route("/video/source/thumb/<int:videoid>")
 def load_picture(videoid):
     video = videomodel.getvideobyid(videoid)

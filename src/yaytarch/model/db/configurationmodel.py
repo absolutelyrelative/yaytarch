@@ -1,5 +1,5 @@
-from ..db import get_db
-from ..tools.outputformat import bcolors
+from ...db import get_db
+from ...tools.outputformat import bcolors
 
 
 class configuration:

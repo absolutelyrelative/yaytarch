@@ -10,6 +10,7 @@ It is a yt-dlp frontend built with python & flask and it allows you to:
 - Download and update playlists from the browser or CLI
 - Browse and watch videos
 - Create local collections of videos
+- Browse self contained folders
 - (Soon) import local videos!
 
 ## Collections view
@@ -53,14 +54,32 @@ Install wheel:
 
 
 ## Usage:
+The usage is divided in usage with a database '(DB)' sections of the usage, and in usage with local, directory mode.
 
-### Initialise configuration:
+
+### (Folder) Download to folder:
+If you prefer not to work without any database, you can download videos locally:
+
+`yaytarch -d LINK`
+
+### (Folder) View a folder:
+Within the folder run:
+
+`yaytarch -f`
+
+A browser window will be automatically opened.
+
+### (DB) Initialise configuration:
 In order to run the app, a default download location needs to be given:
 
 `flask --app yaytarch init-db C:\PATH\TO\STORAGE\`
 
-### View videos:
+### (DB) View videos:
 In order to browse videos locally you can use:
+
+`yaytarch`
+
+or
 
 `flask --app yaytarch run`
 
@@ -69,7 +88,7 @@ Further information will come, for now see https://flask.palletsprojects.com/en/
 
 I take no responsibility in bad usage!
 
-### Download video, playlist, or channel:
+### (DB) Download video, playlist, or channel:
 You can download videos via CLI or UI by pressing the + button.
 
 Playlists will be organised automatically, single videos will be saved to the generic 'All Videos' category.
@@ -77,7 +96,7 @@ Playlists will be organised automatically, single videos will be saved to the ge
 `flask --app yaytarch dl LINK`
 
 
-### Lazy restore:
+### (DB) Lazy restore:
 In case of any issue, you can always re-initialise the database and restore your previous progress. There will be two restore options, this is the so called 'lazy restore' which works by folder discovery. It should be used mainly when the database is unavailable.
 It can also be used to add local videos to the database, but a better way to do so will come soon.
 

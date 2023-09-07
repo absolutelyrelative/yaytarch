@@ -2,7 +2,7 @@ import os
 
 from flask import Flask
 
-from . import db, videocollections, videos, cli
+from . import db, videocollections, videos, clibp
 
 
 def create_app(test_config=None):
@@ -21,7 +21,7 @@ def create_app(test_config=None):
 
     app.register_blueprint(videocollections.bp)
     app.register_blueprint(videos.bp, cli_group=None)
-    app.register_blueprint(cli.bp, cli_group=None)
+    app.register_blueprint(clibp.bp, cli_group=None)
     app.add_url_rule('/', endpoint='index')
 
     return app

@@ -1,8 +1,7 @@
 # This module provides a class object for the M to M relationship between videos and collections in the database.
-from . import collectionmodel
-from . import videomodel
-from ..db import get_db
-from ..tools.outputformat import bcolors
+from . import collectionmodel, videomodel
+from ...db import get_db
+from ...tools.outputformat import bcolors
 
 
 # CREATE TABLE videocollectionmembership (

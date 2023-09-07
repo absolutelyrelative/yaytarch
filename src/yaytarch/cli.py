@@ -1,35 +1,42 @@
-import click
-from flask import current_app, Blueprint
-
-from .db import get_db
-from .model import configurationmodel
-from .tools import backup
-
-# This blueprint takes care of the CLI and any future feature of it
-
-bp = Blueprint('cli', __name__)
+import sys
+import threading
+import webbrowser
+import argparse
+from .__init__ import create_app
+from .tools import videodownload
 
 
-def init_db(location):
-    db = get_db()
+# Defines the behaviour of the user side CLI
+def cli():
+    argparser = argparse.ArgumentParser()
+    argparser.add_argument("-f", "--folder", help="Open viewer on folder.", default='', action='store_true')
+    argparser.add_argument("-d", "--download", help="Download video, playlist, or channel.", default='')
+    argparser.add_argument("-i", "--initdb", help="Initialise database. Specify the default download location.", default='')
+    args = argparser.parse_args()
 
-    # Run setup queries
-    with current_app.open_resource('schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+    #  -f argument
+    if args.folder:  # specifies folder for use in local mode
+        webbrowser.open("http://127.0.0.1:5000/local")
+        view()
 
-    # Save download location setting
-    configuration = configurationmodel.configuration(location, "", "")
-    configurationmodel.initialconfiguration(configuration)
+    #  -d argument
+    if args.download:
+        videodownload.dl(args.download, None, True)
+        sys.exit(0)
+
+    #  no argument
+    #  TODO: Fix app context
+    #if args.folder == '' and args.download == '':
+    #    webbrowser.open("http://127.0.0.1:5000")
+    #    view()
 
 
-@bp.cli.command('init-db')
-@click.argument("downloadlocation")
-def init_db_command(downloadlocation):
-    init_db(downloadlocation)
-    click.echo('Initialised db.')
 
 
-@bp.cli.command('lazyrestore')
-@click.argument('location')
-def lazyrestore(location):
-    backup.lazyrestore(location)
+def view():
+    app = create_app()
+    threading.Thread(target=lambda: app.run(port=5000)).run()
+
+
+if __name__ == "__main__":
+    cli()

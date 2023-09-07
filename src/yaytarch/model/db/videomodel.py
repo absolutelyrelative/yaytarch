@@ -1,7 +1,7 @@
 # This module provides a class object for videos and helper methods to fetch and insert videos. Any data coherence
 # check should be done here.
-from ..db import get_db
-from ..tools.outputformat import bcolors
+from ...db import get_db
+from ...tools.outputformat import bcolors
 
 
 class video:
@@ -42,6 +42,7 @@ def parseresultintoobject(result):
 
     return videoobject
 
+
 # Gets all videos in a list
 def getallvideos():
     db = get_db()
@@ -59,6 +60,7 @@ def getallvideos():
             videolist.append(parseresultintoobject(entry))
         return videolist
     return None
+
 
 # Fetches video object from the database. Returns a video object if the operation is carried out succesfully,
 # None if not.

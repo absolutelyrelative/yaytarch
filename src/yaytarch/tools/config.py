@@ -4,7 +4,7 @@
 # self.params['logger'].debug(message)
 import os.path
 
-from ..model import configurationmodel
+from ..model.db import configurationmodel
 from .outputformat import bcolors
 
 
@@ -74,23 +74,28 @@ class DlLogger:
 
 # Function to generate and return ytdlp options
 class DlOptions:
-    # Set up object
-    def __init__(self, folderloc):
-        # Fetch path from db
-        configuration = configurationmodel.fetchconfiguration()
-        downloadpath = configuration.downloadlocation
+    # Set up object. if Local is true, the application runtime is not expected to be set up -> download path is cwd
+    # TODO: is folderloc necessary?
+    def __init__(self, folderloc, local=False):
+        if local == False:
+            # Try to fetch path from db
+            try:
+                configuration = configurationmodel.fetchconfiguration()
+                downloadpath = configuration.downloadlocation
+            except RuntimeError: #  keeping this in for redundancy. TODO: Is this necessary?
+                #  Application context is not set up, download is local
+                downloadpath = os.getcwd()
+        else:
+            downloadpath = os.getcwd()
 
         # Make sure path is set up correctly
         if os.path.isdir(downloadpath):
             downloadpath = os.path.join(downloadpath, "")
 
-        if folderloc is None:
-            folderloc = "yaylib"
-
         # Paths dictionary
         self.pathdicts = {
             'locdict': {
-                'home': os.path.join(downloadpath, folderloc)
+                'home': downloadpath
             },
             'outputtemplatedict': {
                 'default': "%(id)s.%(ext)s"
