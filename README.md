@@ -77,10 +77,6 @@ In order to run the app, a default download location needs to be given:
 ### (DB) View videos:
 In order to browse videos locally you can use:
 
-`yaytarch`
-
-or
-
 `flask --app yaytarch run`
 
 NOTE: THIS is NOT the correct approach for deployment to a server. You NEED to set-up a correct secret key!
