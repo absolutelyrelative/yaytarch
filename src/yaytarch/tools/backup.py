@@ -6,7 +6,7 @@ import os.path
 import re
 
 from model.db import videomodel
-from . import videodownload
+from tools import videodownload
 
 
 # TODO: Add logging & output to show found files
@@ -62,31 +62,30 @@ def lazyfolderdiscovery(targetfolder: str):
             fileobjectlist.append(extractfilename(entry))
 
         localvideoobjects = []
-        # TODO: There is a bug here. Not the right files are being removed from the list.
-        for file in fileobjectlist:
-            if file.extension in supportedformats:
-                # create object
-                tempvideo = LocalVideoFiles('', '', '', file.basename)
-                tempvideo.videofilename = os.path.join(targetfolder, file.basename + file.extension)
 
-                # attempt to find appropriate json
-                jsonfile = next((subentry for subentry in fileobjectlist if subentry.basename == file.basename and
-                                 subentry.extension == '.json'), None)
-                if jsonfile is not None:
-                    tempvideo.jsonfilename = os.path.join(targetfolder, jsonfile.basename + jsonfile.extension)
-                    fileobjectlist.remove(jsonfile)
+        videofilteredlist = [x for x in fileobjectlist if x.extension in supportedformats]
+        jsonfilteredlist = [x for x in fileobjectlist if x.extension == '.json']
+        thumbfilteredlist = [x for x in fileobjectlist if x.extension == '.jpg']
 
-                # attempt to find appropriate image
-                jpgfile = next((subentry for subentry in fileobjectlist if subentry.basename == file.basename and
-                                subentry.extension == '.jpg'), None)
-                if jpgfile is not None:
-                    tempvideo.thumbfilename = os.path.join(targetfolder, jpgfile.basename + jpgfile.extension)
-                    fileobjectlist.remove(jpgfile)
+        for file in videofilteredlist:
+            # create object
+            tempvideo = LocalVideoFiles('', '', '', file.basename)
+            tempvideo.videofilename = os.path.join(targetfolder, file.basename + file.extension)
 
-                # remove entry from fileobjects
-                fileobjectlist.remove(file)
-                # append to video object list
-                localvideoobjects.append(tempvideo)
+            # attempt to find appropriate json
+            jsonfile = next((subentry for subentry in jsonfilteredlist if subentry.basename == file.basename and
+                             subentry.extension == '.json'), None)
+            if jsonfile is not None:
+                tempvideo.jsonfilename = os.path.join(targetfolder, jsonfile.basename + jsonfile.extension)
+
+            # attempt to find appropriate image
+            jpgfile = next((subentry for subentry in thumbfilteredlist if subentry.basename == file.basename and
+                            subentry.extension == '.jpg'), None)
+            if jpgfile is not None:
+                tempvideo.thumbfilename = os.path.join(targetfolder, jpgfile.basename + jpgfile.extension)
+
+            # append to video object list
+            localvideoobjects.append(tempvideo)
 
         return localvideoobjects
     else:
