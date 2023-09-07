@@ -11,11 +11,6 @@ from tools import videodownload
 
 # TODO: Add logging & output to show found files
 
-# Custom exceptions for importing operation
-class ImportException(Exception):
-    def __init__(self, message):
-        self.message = message
-
 
 # Class to handle status
 class Report:
@@ -32,9 +27,19 @@ class LocalVideoFiles:
         self.thumbfilename = thumbfilename
         self.shorturl = shorturl
 
-    # Generates a videomodel instance
-    def returnvideoobject(self):
-        pass
+    def __str__(self):
+        message = ''
+        if self.shorturl is not None:
+            message += self.shorturl + ': '
+        if self.videofilename is not None:
+            message += self.videofilename + ', '
+        if self.thumbfilename is not None:
+            message += self.thumbfilename + ', '
+        if self.jsonfilename is not None:
+            message += self.jsonfilename
+        if message != '':
+            return message
+        return 'Empty'
 
 
 class File:  # Another reason windows sucks.
@@ -89,7 +94,7 @@ def lazyfolderdiscovery(targetfolder: str):
 
         return localvideoobjects
     else:
-        pass  # TODO: Add exception ?
+        print("Path is not a valid folder.")
 
 
 # Creates the video objects and inserts them in the database.
